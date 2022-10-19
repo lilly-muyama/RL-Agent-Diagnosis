@@ -64,6 +64,7 @@ class SyntheticEnv(Env):
             y_pred = action
         elif self.actions[action] in self.trajectory: #terminate episode in case of repeated action
             #terminated = False
+            action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
             reward -= 1
             self.total_reward -= 1
@@ -72,7 +73,7 @@ class SyntheticEnv(Env):
             #y_actual = np.nan
             y_actual = self.y
             #y_pred = np.nan
-            y_pred = constants.CLASS_DICT['Inconclusive diagnosis']
+            y_pred = action
             #is_success = None
             is_success = True if y_actual==y_pred else False
         else: #for newly acquired actions
