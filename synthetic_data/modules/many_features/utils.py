@@ -203,7 +203,6 @@ def generate_nans(df, column_list, frac):
 
 def get_dt_performance(df):
     #performance of a decision tree on a dataset
-   
     df = df.fillna(-1)
     class_dict = constants.CLASS_DICT
     df['label'] = df['label'].replace(class_dict)

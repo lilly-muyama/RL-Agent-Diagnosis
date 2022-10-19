@@ -2,6 +2,7 @@ import random
 import constants
 import pandas as pd
 from modules.many_features.env import SyntheticEnv
+from modules.many_features import constants
 #random.seed(constants.SEED)
 
 class DTAgent():
@@ -56,6 +57,9 @@ class DTAgent():
     def get_feature_value(self, idx):
         if idx >= self.env.num_classes:
             feature_idx = idx-self.env.num_classes
+            # print(f'Action space length: {len(constants.ACTION_SPACE)}')
+            # print(f'Class num: {constants.CLASS_NUM}')
+            # print(f'Feature number: {constants.FEATURE_NUM}')
             x = self.env.x.reshape(-1, constants.FEATURE_NUM)
             x_value = self.env.x[0, feature_idx]
             return x_value
