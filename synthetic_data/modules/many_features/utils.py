@@ -50,6 +50,7 @@ def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None):
     env.close()
     return model
 
+
 def stable_dqn(X_train, y_train, timesteps, save=False, filename=None):
     from stable_baselines import DQN
     from stable_baselines import bench, logger
