@@ -240,7 +240,7 @@ def generate_tuple_dict(df):
             frequency_dict[traj] += 1
         else:
             frequency_dict[traj] = 1
-    print(f'frequency_dict: {frequency_dict}')
+    #print(f'frequency_dict: {frequency_dict}')
     overall_tup_dict = {}
     for key, value in frequency_dict.items():
         new_key = ast.literal_eval(key)
@@ -250,10 +250,51 @@ def generate_tuple_dict(df):
                 overall_tup_dict[tup] += value
             else:
                 overall_tup_dict[tup] = value
-    print(f'overall_tup_dict: {overall_tup_dict}')
+    #print(f'overall_tup_dict: {overall_tup_dict}')
     return overall_tup_dict
 
-def draw_sankey_diagram(df, title, save=False, filename=False):
+def create_sankey_df(df):
+    overall_tup_dict = generate_tuple_dict(df)
+    sankey_df = pd.DataFrame()
+    sankey_df['Label1'] = [i[0] for i in overall_tup_dict.keys()]
+    sankey_df['Label2'] = [i[1] for i in overall_tup_dict.keys()]
+    sankey_df['value'] = list(overall_tup_dict.values())
+    return sankey_df
+
+
+def create_source_and_target(sankey_df, dmap):
+    sankey_df['source'] = sankey_df['Label1'].map(dmap)
+    sankey_df['target'] = sankey_df['Label2'].map(dmap)
+    sankey_df.sort_values(by=['source'], inplace=True)
+    return sankey_df
+
+def draw_sankey_diagram(pos_df, neg_df, title, save=False, filename=False):
+    pos_sankey_df = create_sankey_df(pos_df)
+    neg_sankey_df = create_sankey_df(neg_df)
+    unique_actions = list(set(list(pos_sankey_df['Label1'].unique()) + list(pos_sankey_df['Label2'].unique()) + list(neg_sankey_df['Label1'].unique()) + list(neg_sankey_df['Label2'].unique())))
+    dmap = dict(zip(unique_actions, range(len(unique_actions))))
+    
+    pos_sankey_df = create_source_and_target(pos_sankey_df, dmap)
+    neg_sankey_df = create_source_and_target(neg_sankey_df, dmap)
+    nodes_color = get_colors(len(dmap))
+    
+    label = unique_actions
+    
+    target = list(pos_sankey_df['target']) + list(neg_sankey_df['target'])
+    value = list(pos_sankey_df['value']) + list(neg_sankey_df['value'])
+    source = list(pos_sankey_df['source']) + list(neg_sankey_df['source'])
+    link_color = ['green']*len(pos_sankey_df) + ['red']*len(neg_sankey_df)
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(pad=15, thickness=20, line=dict(color='black', width=0.5), label=label, color=nodes_color),
+        link= dict(source=source, target=target, value=value, color=link_color)
+    )])
+    fig.update_layout(title_text=title, title_x=0.5,  title_font_size=24, title_font_color='black', 
+                      title_font_family='Times New Roman')
+    if save:
+        fig.write_html(f'{filename}.html')
+    fig.show()
+
+def draw_sankey_diagram_orig(df, title, save=False, filename=False):
     overall_tuple_dict = generate_tuple_dict(df)
     sankey_df = pd.DataFrame()
     sankey_df['Label1'] = [i[0] for i in overall_tuple_dict.keys()]
@@ -263,7 +304,6 @@ def draw_sankey_diagram(df, title, save=False, filename=False):
     dmap = dict(zip(unique_actions, range(len(unique_actions))))
     sankey_df['source'] = sankey_df['Label1'].map(dmap)
     sankey_df['target'] = sankey_df['Label2'].map(dmap)
-    print(sankey_df)
     sankey_df.sort_values(by=['source'], inplace=True)
     nodes_color = get_colors(len(dmap))
     label = unique_actions
