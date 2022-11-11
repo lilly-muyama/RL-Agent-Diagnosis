@@ -202,11 +202,12 @@ def generate_nans(df, column_list, frac):
         df.loc[vals_to_nan, col] = np.nan
     return df
 
-def get_dt_performance(df):
+def get_dt_performance(df, labels='string'): #labels can also be numeric
     #performance of a decision tree on a dataset
     df = df.fillna(-1)
-    class_dict = constants.CLASS_DICT
-    df['label'] = df['label'].replace(class_dict)
+    if labels == 'string':
+        class_dict = constants.CLASS_DICT
+        df['label'] = df['label'].replace(class_dict)
     X = df.iloc[:, 0:-1]
     y = df.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=constants.SEED)
