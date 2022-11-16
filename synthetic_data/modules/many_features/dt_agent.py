@@ -120,7 +120,7 @@ class DTAgent():
 
     def predict_act_ferritin(self, val):
         if val < 0:
-            return 'tibc'
+            return 'Inconclusive diagnosis'
         elif val < 30:
             return 'Iron deficiency anemia'
         elif val > 100:

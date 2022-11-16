@@ -277,7 +277,8 @@ def draw_sankey_diagram(pos_df, neg_df, title, save=False, filename=False):
     
     pos_sankey_df = create_source_and_target(pos_sankey_df, dmap)
     neg_sankey_df = create_source_and_target(neg_sankey_df, dmap)
-    nodes_color = get_colors(len(dmap))
+    #nodes_color = get_colors(len(dmap))
+    nodes_color = 'orange'
     
     label = unique_actions
     
