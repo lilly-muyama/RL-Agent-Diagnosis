@@ -80,8 +80,9 @@ def evaluate_dqn(dqn_model, X_test, y_test):
             obs, done = env.reset(), False
             while not done:
                 action, _states = dqn_model.predict(obs, deterministic=True)
-                obs, rew, done,info = env.step(action)
+                obs, rew, done, info = env.step(action)
                 if done == True:
+                    #print(f'info: {info}')
                     test_df = test_df.append(info, ignore_index=True)
     except StopIteration:
         print('Testing done.....')

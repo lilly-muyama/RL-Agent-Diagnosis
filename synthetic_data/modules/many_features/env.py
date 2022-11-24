@@ -39,6 +39,10 @@ class SyntheticEnv(Env):
         
     
     def step(self, action):
+        #print(f'type: {type(action)}')
+        if isinstance(action, np.ndarray):
+            action = int(action)
+
         self.episode_length += 1
         reward = 0
         if self.episode_length == self.max_steps: 
@@ -50,11 +54,15 @@ class SyntheticEnv(Env):
             y_pred = constants.CLASS_DICT['Inconclusive diagnosis']
             is_success = True if y_actual==y_pred else False
         elif action < self.num_classes: 
+            #print(f'action: {action}')
+            #print(f'action type: {type(action)}')
             if action == self.y:
+                #print('correct diag')
                 reward +=1
                 self.total_reward += 1
                 is_success = True
             else:
+                #print('incorrect diag')
                 reward -= 1
                 self.total_reward -= 1
                 is_success = False
@@ -62,6 +70,7 @@ class SyntheticEnv(Env):
             done = True
             y_actual = self.y
             y_pred = action
+            #print(f'y_pred: {type(y_pred)}')
         elif self.actions[action] in self.trajectory: #terminate episode in case of repeated action
             #terminated = False
             action = constants.CLASS_DICT['Inconclusive diagnosis']
@@ -86,6 +95,7 @@ class SyntheticEnv(Env):
             y_pred = np.nan
             is_success = None
         self.trajectory.append(self.actions[action])
+        #print(f'y_pred2: {type(y_pred)}')
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward': self.total_reward, 'y_pred': y_pred, 
                 'y_actual': y_actual, 'trajectory':self.trajectory, 'terminated':terminated, 'is_success': is_success}
         return self.state, reward, done, info
