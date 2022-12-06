@@ -1,6 +1,7 @@
-import pandas as pandas
+import pandas as pd
 import numpy as np
-
+from modules import constants
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 domains_feat_dict = constants.DOMAINS_FEAT_DICT
 domains_max_scores_dict = constants.DOMAINS_MAX_SCORES_DICT
@@ -68,3 +69,28 @@ def compute_score(state):
         domain_score = get_domain_score(row, domain)
         total_row_score += domain_score
     return total_row_score
+
+def success_rate(test_df):
+    success_df = test_df[test_df['y_pred']==test_df['y_actual']]
+    success_rate = len(success_df)/len(test_df)*100
+    return success_rate, success_df
+
+def test(ytest, ypred): # changed to show precision and recall
+    accuracy = accuracy_score(ytest, ypred)
+    precision = precision_score(ytest, ypred)
+    recall = recall_score(ytest, ypred)
+    f1 = f1_score(ytest, ypred)
+    return accuracy*100, precision*100, recall*100, f1*100
+
+def compute_feature_importance(model, x, verbose=False):
+    importance = model.feature_importances_
+    if verbose:
+        for i,v in enumerate(importance):
+            print('Feature: %0d, Score: %.5f' % (i,v))
+    feats = {} # a dict to hold feature_name: feature_importance
+    for feature, importance in zip(x.columns, importance):
+        feats[feature] = importance #add the name/value pair 
+
+    importances = pd.DataFrame.from_dict(feats, orient='index').rename(columns={0: 'Importance'})
+    importances.sort_values(by='Importance').plot(kind='bar', rot=90)
+

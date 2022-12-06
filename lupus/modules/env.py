@@ -77,9 +77,9 @@ class LupusEnv(Env):
             y_pred = np.nan
             is_success = None
         self.trajectory.append(self.actions[action])
-        score = utils.compute_score()
+        episode_score = utils.compute_score(self.state) if done else np.nan
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward':self.total_reward, 'y_pred':y_pred, 'y_actual':y_actual, 
-        'trajectory':self.trajectory, 'terminated':terminated, 'is_success': is_success}
+        'trajectory':self.trajectory, 'terminated':terminated, 'score':episode_score,'is_success': is_success}
         return self.state, reward, done, info
 
 
