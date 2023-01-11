@@ -4,14 +4,14 @@ SEED = 42
 FEATURE_NUM = 26
 GYM_BOX_LOW = -1
 GYM_BOX_HIGH = np.inf
-ACTION_SPACE = ['Negative', 'Positive', 'Inconclusive diagnosis', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium', 
+ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium', 
 'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'subacute_cutaneous', 'discoid_lupus', 'acute_cutaneous_lupus', 'pleural_effusion', 
 'pericardial_effusion', 'acute_pericarditis', 'joint_involvement', 'proteinuria', 'renal_biopsy_class', 'anti_cardioliphin_antibodies', 
-'anti_b2gp4_antibodies', 'lupus_anti_coagulant', 'c3', 'c4', 'anti_dsdna_antibody', 'anti_smith_antibody' ]
+'anti_b2gp1_antibodies', 'lupus_anti_coagulant', 'c3', 'c4', 'anti_dsdna_antibody', 'anti_smith_antibody' ]
 MAX_STEPS = 10
 CLASS_NUM = 3
 ACTION_NUM = FEATURE_NUM + CLASS_NUM
-CLASS_DICT = {'Negative':0, 'Positive':1, 'Inconclusive diagnosis':2} 
+CLASS_DICT = {'No lupus':0, 'Lupus':1, 'Inconclusive diagnosis':2} 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'], 'hematologic': ['leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis'], 
 'neuropsychiatric': ['delirium', 'psychosis', 'seizure'], 
 'mucocutaneous': ['non_scarring_alopecia', 'oral_ulcers', 'subacute_cutaneous', 'discoid_lupus', 'acute_cutaneous_lupus'],

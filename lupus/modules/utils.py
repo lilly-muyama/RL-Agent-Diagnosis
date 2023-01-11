@@ -1,11 +1,21 @@
 import pandas as pd
 import numpy as np
+import os
+import random
+import torch
 from modules import constants
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from modules.env import LupusEnv
+
 
 domains_feat_dict = constants.DOMAINS_FEAT_DICT
 domains_max_scores_dict = constants.DOMAINS_MAX_SCORES_DICT
 criteria_weights = constants.CRITERIA_WEIGHTS
+
+random.seed(constants.SEED)
+np.random.seed(constants.SEED)
+os.environ['PYTHONHASHSEED']=str(constants.SEED)
 
 def get_domain_score(row, domain):
     domain_features = domains_feat_dict[domain]
@@ -94,3 +104,54 @@ def compute_feature_importance(model, x, verbose=False):
     importances = pd.DataFrame.from_dict(feats, orient='index').rename(columns={0: 'Importance'})
     importances.sort_values(by='Importance').plot(kind='bar', rot=90)
 
+
+def split_dataset(df):
+    X = df.iloc[:, 0:-1]
+    y = df.iloc[:, -1]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=SEED, stratify=y)
+    return X_train, X_test, y_train, y_test
+
+def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None):
+    from stable_baselines3 import DQN
+    print('using stable baselines 3')
+    torch.manual_seed(constants.SEED)
+    torch.use_deterministic_algorithms(True)
+
+    env = create_env(X_train, y_train)
+    model = DQN('MlpPolicy', env, verbose=1, seed=constants.SEED)
+    model.learn(total_timesteps=timesteps, log_interval=100)
+    if save:
+        model.save(filename)
+    env.close()
+    return model
+
+def create_env(X, y, random=True):
+    env = LupusEnv(X, y, random)
+    return env
+
+def load_dqn3(filename, env=None):
+    from stable_baselines3 import DQN
+    print('Using stable baselines 3')
+    model = DQN.load(filename, env=env)
+    return model
+
+def evaluate_dqn(dqn_model, X_test, y_test):
+    test_df = pd.DataFrame()
+    env = create_env(X_test, y_test, random=False)
+    count=0
+
+    try:
+        while True:
+            count+=1
+            if count%(len(X_test)/5)==0:
+                print(f'Count: {count}')
+            obs, done = env.reset(), False
+            while not done:
+                action, _states = dqn_model.predict(obs, deterministic=True)
+                obs, rew, done, info = env.step(action)
+                if done == True:
+                    #print(f'info: {info}')
+                    test_df = test_df.append(info, ignore_index=True)
+    except StopIteration:
+        print('Testing done.....')
+    return test_df

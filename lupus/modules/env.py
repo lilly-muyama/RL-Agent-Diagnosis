@@ -1,15 +1,14 @@
 import os
 import random
 import numpy as np
-import constants
+from modules import constants
 from gym import Env
 from gym.spaces import Discrete, Box
 
 
-
-random.SEED(constants.SEED)
-np.random.SEED(constants.SEED)
-os.environ['PYTHONHASHSEED']=str(SEED)
+random.seed(constants.SEED)
+np.random.seed(constants.SEED)
+os.environ['PYTHONHASHSEED']=str(constants.SEED)
 
 
 class LupusEnv(Env):
@@ -58,7 +57,7 @@ class LupusEnv(Env):
             done = True
             y_actual = self.y 
             y_pred = action
-        elif self.actions[action] in self.trajectory:
+        elif self.actions[action] in self.trajectory: #repeated action
             action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
             reward -= 1
@@ -83,36 +82,36 @@ class LupusEnv(Env):
         return self.state, reward, done, info
 
 
-        def render(self):
-            print(f'STEP {self.episode_length} for index {self.idx}')
-            print(f'Current state: {self.state}')
-            print(f'Total reward: {self.total_reward}')
-            print(f'Trajectory: {self.trajectory}')
+    def render(self):
+        print(f'STEP {self.episode_length} for index {self.idx}')
+        print(f'Current state: {self.state}')
+        print(f'Total reward: {self.total_reward}')
+        print(f'Trajectory: {self.trajectory}')
+
+    
+    def reset(self, idx=None):
+        if idx is not None:
+            self.idx = idx
+        elif self.random:
+            self.idx = random.randint(0, self.sample_num-1)
+        else:
+            self.idx += 1
+            if self.idx == len(self.X):
+                raise StopIteration()
+        self.x, self.y = self.X[self.idx], self.Y[self.idx]
+        self.state = np.full((constants.FEATURE_NUM,), -1, dtype=np.float32)
+        self.trajectory = []
+        self.episode_length = 0
+        self.total_reward = 0
+        return self.state
 
         
-        def reset(self, idx=None):
-            if idx is not None:
-                self.idx = idx
-            elif self.random:
-                self.idx = random.randint(0, self.sample_num-1)
-            else:
-                self.idx += 1
-                if self.idx == len(self.X):
-                    raise StopIteration()
-            self.x, self.y = self.X[self.idx], self.Y[self.idx]
-            self.state = np.full((constants.FEATURE_NUM,), -1, dtype=np.float32)
-            self.trajectory = []
-            self.episode_length = 0
-            self.total_reward = 0
-            return self.state
-
-        
-        def get_next_state(self, feature_idx):
-            self.x = self.x.reshape(-1, constants.FEATURE_NUM)
-            x_value = self.x[0, feature_idx]
-            next_state = copy.deepcopy(self.state)
-            next_state[feature_idx] = x_value
-            return next_state
+    def get_next_state(self, feature_idx):
+        self.x = self.x.reshape(-1, constants.FEATURE_NUM)
+        x_value = self.x[0, feature_idx]
+        next_state = copy.deepcopy(self.state)
+        next_state[feature_idx] = x_value
+        return next_state
 
 
 
