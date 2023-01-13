@@ -5,7 +5,7 @@ import random
 import torch
 from modules import constants
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from modules.env import LupusEnv
 
 
@@ -69,8 +69,12 @@ def get_renal_biopsy_score(result_class):
         return 0
 
 def compute_score(state):
-    df = pd.DataFrame(columns = constants.ACTION_SPACE[constants.CLASS_NUM:])
-    df = df.append(state)
+    #print(f'state size:{state.shape}')
+    #print(f'state type:{type(state)}')
+    #print(f'state:{state}')
+    state = state.reshape(-1, constants.FEATURE_NUM)
+    df = pd.DataFrame(state, columns = constants.ACTION_SPACE[constants.CLASS_NUM:])
+    #df = df.append(state)
     row = df.iloc[0]
     if row['ana'] == 0: # negative - 0 positive - 1
         return 0
@@ -85,12 +89,40 @@ def success_rate(test_df):
     success_rate = len(success_df)/len(test_df)*100
     return success_rate, success_df
 
-def test(ytest, ypred): # changed to show precision and recall
+def get_avg_length_reward(df):
+    length = np.mean(df.episode_length)
+    reward = np.mean(df.reward)
+    return length, reward
+
+def test_binary(ytest, ypred): # changed to show precision and recall
     accuracy = accuracy_score(ytest, ypred)
     precision = precision_score(ytest, ypred)
     recall = recall_score(ytest, ypred)
     f1 = f1_score(ytest, ypred)
     return accuracy*100, precision*100, recall*100, f1*100
+
+def test(ytest, ypred):
+    acc = accuracy_score(ytest, ypred)
+    f1 = f1_score(ytest, ypred, average ='macro', labels=np.unique(ytest))
+    try:
+        roc_auc = multiclass(ytest, ypred)
+    except:
+        roc_auc = None
+    return acc*100, f1*100, roc_auc*100
+
+def multiclass(actual_class, pred_class, average = 'macro'):
+
+    unique_class = set(actual_class)
+    roc_auc_dict = {}
+    for per_class in unique_class:
+        other_class = [x for x in unique_class if x != per_class]
+        new_actual_class = [0 if x in other_class else 1 for x in actual_class]
+        new_pred_class = [0 if x in other_class else 1 for x in pred_class]
+        roc_auc = roc_auc_score(new_actual_class, new_pred_class, average = average)
+        roc_auc_dict[per_class] = roc_auc
+    avg = sum(roc_auc_dict.values()) / len(roc_auc_dict)
+    return avg
+
 
 def compute_feature_importance(model, x, verbose=False):
     importance = model.feature_importances_
@@ -119,7 +151,7 @@ def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None):
 
     env = create_env(X_train, y_train)
     model = DQN('MlpPolicy', env, verbose=1, seed=constants.SEED)
-    model.learn(total_timesteps=timesteps, log_interval=100)
+    model.learn(total_timesteps=timesteps, log_interval=100000)
     if save:
         model.save(filename)
     env.close()
@@ -147,11 +179,21 @@ def evaluate_dqn(dqn_model, X_test, y_test):
                 print(f'Count: {count}')
             obs, done = env.reset(), False
             while not done:
+                #print(f'current state: {obs}')
                 action, _states = dqn_model.predict(obs, deterministic=True)
                 obs, rew, done, info = env.step(action)
+                #print(f'action: {action}')
+                #print(f'new state: {obs}')
+                #print(f'reward: {rew}')
+                #print(f'done: {done}')
+                #print(f'info: {info}')
+
                 if done == True:
                     #print(f'info: {info}')
                     test_df = test_df.append(info, ignore_index=True)
+                    #print('EPISODE DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     except StopIteration:
         print('Testing done.....')
     return test_df
+
+

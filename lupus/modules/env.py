@@ -1,7 +1,8 @@
 import os
 import random
+import copy
 import numpy as np
-from modules import constants
+from modules import constants, utils
 from gym import Env
 from gym.spaces import Discrete, Box
 
@@ -32,7 +33,11 @@ class LupusEnv(Env):
         self.random = random
 
     def step(self, action):
+        #print('NEW STEP!!!!!!!!!!!!!!!!!!!!')
+        #print(f'Current state: {self.state}')
+        #print(f'action: {action}')
         if isinstance(action, np.ndarray):
+            #print('CONVERTING ACTION')
             action == int(action)
         self.episode_length += 1
         reward = 0
@@ -42,8 +47,11 @@ class LupusEnv(Env):
             terminated = True
             done = True
             y_actual = self.y 
-            y_pred = constants.CLASS_DICT['Inconclusive diagnosis']
+            y_pred = int(constants.CLASS_DICT['Inconclusive diagnosis'])
             is_success = True if y_actual == y_pred else False
+            self.state = self.get_next_state(action - self.num_classes)
+            self.trajectory.append(self.actions[action])
+            self.trajectory.append('Inconclusive diagnosis')
         elif action < self.num_classes: # if diagnosis action
             if action == self.y:
                 reward += 1
@@ -56,7 +64,8 @@ class LupusEnv(Env):
             terminated = False
             done = True
             y_actual = self.y 
-            y_pred = action
+            y_pred = int(action)
+            self.trajectory.append(self.actions[action])
         elif self.actions[action] in self.trajectory: #repeated action
             action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
@@ -64,8 +73,9 @@ class LupusEnv(Env):
             self.total_reward -= 1
             done = True
             y_actual = self.y 
-            y_pred == action
+            y_pred = int(action)
             is_success = True if y_actual == y_pred else False
+            self.trajectory.append(self.actions[action])
         else:
             terminated = False
             reward += 0
@@ -75,10 +85,13 @@ class LupusEnv(Env):
             y_actual = np.nan
             y_pred = np.nan
             is_success = None
-        self.trajectory.append(self.actions[action])
+            self.trajectory.append(self.actions[action])
+        #print(f'Next state: {self.state}')
+        
         episode_score = utils.compute_score(self.state) if done else np.nan
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward':self.total_reward, 'y_pred':y_pred, 'y_actual':y_actual, 
         'trajectory':self.trajectory, 'terminated':terminated, 'score':episode_score,'is_success': is_success}
+        #print(f'info: {info}')
         return self.state, reward, done, info
 
 
@@ -90,6 +103,7 @@ class LupusEnv(Env):
 
     
     def reset(self, idx=None):
+        #print('RESETTING ENVIRONMENT!!!!!!!!!!!!!!!!!!!!!')
         if idx is not None:
             self.idx = idx
         elif self.random:
