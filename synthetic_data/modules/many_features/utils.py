@@ -402,7 +402,7 @@ def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=4
 def plot_classification_report(y_actual, y_pred, save=False, filename=False, cmap='RdBu'):
     cr = classification_report(y_actual, y_pred)
     lines = cr.split('\n')
-    class_names = list(constants. CLASS_DICT.keys())
+    class_names = list(constants.CLASS_DICT.keys())
     plotMat = []
     support = []
     #class_names = []

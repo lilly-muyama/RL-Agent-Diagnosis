@@ -1,12 +1,18 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import os
+import ast
 import random
 import torch
 from modules import constants
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import confusion_matrix, classification_report
 from modules.env import LupusEnv
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 
 
 domains_feat_dict = constants.DOMAINS_FEAT_DICT
@@ -195,5 +201,193 @@ def evaluate_dqn(dqn_model, X_test, y_test):
     except StopIteration:
         print('Testing done.....')
     return test_df
+
+############################CONFUSION MATRIX AND CLASSIFICATION REPORT FUNCTIONS##########################################################
+def plot_confusion_matrix(y_actual, y_pred, save=False, filename=False):
+    cm = confusion_matrix(y_actual, y_pred)
+    if len(y_pred.unique()) == 2:
+        cm_df = pd.DataFrame(cm, index = [0, 1], columns = [0, 1])
+    elif len(y_pred.unique()) == 3:
+        cm_df = pd.DataFrame(cm, index = constants.CLASS_DICT.keys(), columns = constants.CLASS_DICT.keys())
+    else:
+        print('Unexpected number of predicted classes')
+        return
+    plt.figure(figsize=(10, 8))
+    ax = sns.heatmap(cm_df, annot=True)
+    bottom, top = ax.get_ylim()
+    ax.set_ylim(bottom + 0.5, top - 0.5)
+    plt.title('Confusion Matrix')
+    plt.ylabel('Actual Class')
+    plt.xlabel('Predicted Class')
+    plt.tight_layout()
+    if save:
+        plt.savefig(filename)
+    plt.show()
+    plt.close()
+
+def cm2inch(*tupl):
+    inch = 2.54
+    if type(tupl[0]) == tuple:
+        return tuple(i/inch for i in tupl[0])
+    else:
+        return tuple(i/inch for i in tupl)
+
+def show_values(pc, fmt="%.2f", **kw):    
+    pc.update_scalarmappable()
+    ax = pc.axes
+    for p, color, value in zip(pc.get_paths(), pc.get_facecolors(), pc.get_array()):
+        x, y = p.vertices[:-2, :].mean(0)
+        if np.all(color[:3] > 0.5):
+            color = (0.0, 0.0, 0.0)
+        else:
+            color = (1.0, 1.0, 1.0)
+        ax.text(x, y, fmt % value, ha="center", va="center", color=color, **kw)
+
+def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=40, figure_height=20, correct_orientation=False, cmap='RdBu'):
+    fig, ax = plt.subplots()    
+    c = ax.pcolor(AUC, edgecolors='k', linestyle= 'dashed', linewidths=0.2, cmap=cmap)
+    ax.set_yticks(np.arange(AUC.shape[0]) + 0.5, minor=False)
+    ax.set_xticks(np.arange(AUC.shape[1]) + 0.5, minor=False)
+    ax.set_xticklabels(xticklabels, minor=False)
+    ax.set_yticklabels(yticklabels, minor=False)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)      
+
+    # Remove last blank column
+    plt.xlim( (0, AUC.shape[1]) )
+
+    # Turn off all the ticks
+    ax = plt.gca()    
+    for t in ax.xaxis.get_major_ticks():
+        t.tick1On = False
+        t.tick2On = False
+    for t in ax.yaxis.get_major_ticks():
+        t.tick1On = False
+        t.tick2On = False
+
+    # Add color bar
+    plt.colorbar(c)
+
+    # Add text in each cell 
+    show_values(c)
+
+    # Proper orientation (origin at the top left instead of bottom left)
+    if correct_orientation:
+        ax.invert_yaxis()
+        ax.xaxis.tick_top()       
+
+    # resize 
+    fig = plt.gcf()
+    fig.set_size_inches(cm2inch(figure_width, figure_height))
+
+def plot_classification_report(y_actual, y_pred, save=False, filename=False, cmap='RdBu'):
+    cr = classification_report(y_actual, y_pred)
+    lines = cr.split('\n')
+    class_names = list(constants.CLASS_DICT.keys())
+    plotMat = []
+    support = []
+    #class_names = []
+    #count = 0
+    for line in lines[2 : (len(lines) - 5)]:
+        t = line.strip().split()
+        if len(t) < 2: continue
+        v = [float(x) for x in t[1: len(t) - 1]]
+        support.append(int(t[-1]))
+        plotMat.append(v)
+
+    xlabel = 'Metrics'
+    ylabel = 'Classes'
+    xticklabels = ['Precision', 'Recall', 'F1-score']
+    ytick_labels = [f'{class_names[i]}({sup})' for i, sup in enumerate(support) ]
+    
+    #print(len(support))
+    yticklabels = ['{0} ({1})'.format(class_names[idx], sup) for idx, sup  in enumerate(support)]
+    figure_width = 25
+    figure_height = len(class_names) + 7
+    correct_orientation = False
+    heatmap(np.array(plotMat), 'classification report', xlabel, ylabel, xticklabels, yticklabels, figure_width, figure_height, correct_orientation, cmap=cmap)
+    #plt.tight_layout()
+    if save:
+        plt.savefig(filename, bbox_inches = 'tight')
+    plt.show()
+    plt.close()
+
+##############################################PATHWAY FUNCTIONS#########################################################################
+get_colors = lambda n: list(map(lambda i: "#" + "%06x" % random.randint(0, 0xFFFFFF),range(n)))
+
+lupus_classes = list(constants.CLASS_DICT.keys())
+
+def generate_filename(i):
+    lupus_class = lupus_classes[i]
+    filename = lupus_class.lower().replace(' ', '_').replace('/','_')
+    return filename
+
+def generate_title(i, patient_num):
+    lupus_class = lupus_classes[i]
+    title = f'Diagnosis Pathway for {lupus_class} - ({patient_num} patients)'
+    return title
+
+def generate_tuple_dict(df):
+    frequency_dict = {}
+    for traj in df.trajectory:
+        if traj in frequency_dict.keys():
+            frequency_dict[traj] += 1
+        else:
+            frequency_dict[traj] = 1
+    #print(f'frequency_dict: {frequency_dict}')
+    overall_tup_dict = {}
+    for key, value in frequency_dict.items():
+        new_key = ast.literal_eval(key)
+        for tup in zip(new_key, new_key[1:]):
+            #print(f'tup: {tup}')
+            if tup in overall_tup_dict.keys():
+                overall_tup_dict[tup] += value
+            else:
+                overall_tup_dict[tup] = value
+    #print(f'overall_tup_dict: {overall_tup_dict}')
+    return overall_tup_dict
+
+def create_sankey_df(df):
+    overall_tup_dict = generate_tuple_dict(df)
+    sankey_df = pd.DataFrame()
+    sankey_df['Label1'] = [i[0] for i in overall_tup_dict.keys()]
+    sankey_df['Label2'] = [i[1] for i in overall_tup_dict.keys()]
+    sankey_df['value'] = list(overall_tup_dict.values())
+    return sankey_df
+
+
+def create_source_and_target(sankey_df, dmap):
+    sankey_df['source'] = sankey_df['Label1'].map(dmap)
+    sankey_df['target'] = sankey_df['Label2'].map(dmap)
+    sankey_df.sort_values(by=['source'], inplace=True)
+    return sankey_df
+
+def draw_sankey_diagram(pos_df, neg_df, title, save=False, filename=False):
+    pos_sankey_df = create_sankey_df(pos_df)
+    neg_sankey_df = create_sankey_df(neg_df)
+    unique_actions = list(set(list(pos_sankey_df['Label1'].unique()) + list(pos_sankey_df['Label2'].unique()) + list(neg_sankey_df['Label1'].unique()) + list(neg_sankey_df['Label2'].unique())))
+    dmap = dict(zip(unique_actions, range(len(unique_actions))))
+    
+    pos_sankey_df = create_source_and_target(pos_sankey_df, dmap)
+    neg_sankey_df = create_source_and_target(neg_sankey_df, dmap)
+    #nodes_color = get_colors(len(dmap))
+    nodes_color = 'orange'
+    
+    label = unique_actions
+    
+    target = list(pos_sankey_df['target']) + list(neg_sankey_df['target'])
+    value = list(pos_sankey_df['value']) + list(neg_sankey_df['value'])
+    source = list(pos_sankey_df['source']) + list(neg_sankey_df['source'])
+    link_color = ['green']*len(pos_sankey_df) + ['red']*len(neg_sankey_df)
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(pad=15, thickness=20, line=dict(color='black', width=0.5), label=label, color=nodes_color),
+        link= dict(source=source, target=target, value=value, color=link_color)
+    )])
+    fig.update_layout(title_text=title, title_x=0.5,  title_font_size=24, title_font_color='black', 
+                      title_font_family='Times New Roman')
+    if save:
+        fig.write_html(f'{filename}.html')
+    fig.show()
 
 
