@@ -41,38 +41,53 @@ def get_domain_score(row, domain):
         raise Exception('The score is too large for this domain!')
     return domain_score
 
-def get_c3_c4_score(c3, c4): # 0 - low, 1 is not low, -1 is unknown
-    if (c3 == 0) & (c4 == 0):
+def get_domain_score(row, domain):
+    domain_features = domains_feat_dict[domain]
+    domain_score = 0
+    if domain == 'complement_proteins':
+        domain_score = get_c3_c4_score(row.low_c3, row.low_c4)
+        domain_features = list(set(domain_features) - set(['low_c3', 'low_c4']))
+    for feat in domain_features:
+        if row[feat] >= 0:
+            if feat == 'cutaneous_lupus': # to delete
+                feat_score = get_cutaneous_lupus_score(row.cutaneous_lupus)
+            else:
+                feat_score = get_feat_score(row, feat)
+            if feat_score > domain_score:
+                domain_score = feat_score
+    if domain_score > domains_max_scores_dict[domain]:
+        raise Exception('The score is too large for this domain!')
+    return domain_score
+
+def get_c3_c4_score(c3, c4): # 0 - low, 1 is not low
+    if (c3 == 1) & (c4 == 1):
         return criteria_weights['low_c3_and_low_c4']
-    elif (c3 == 0) | (c4 == 0):
+    elif (c3 == 1) | (c4 == 1):
         return criteria_weights['low_c3_or_low_c4']
     else:
         return 0
 
 def get_feat_score(row, feat):
-    if feat == 'proteinuria':
-        feat_score = get_proteinura_score(row[feat])
-    elif feat == 'renal_biopsy_class':
-        feat_score = get_renal_biopsy_score(row[feat])
+    if feat == 'cutaneous_lupus':
+        feat_score = get_cutaneous_lupus_score(row[feat])
     elif row[feat] <= 0:
         feat_score = 0
     else:
         feat_score = criteria_weights[feat]
     return feat_score
 
-def get_proteinura_score(amount):
-    if amount > 0.5:
-        return 4
-    else:
+def get_cutaneous_lupus_score(cutaneous_type):
+    if cutaneous_type == 0: #negative for any form of cutaneous lupus
         return 0
+    elif cutaneous_type == 1: #subacute cutaneous lupus
+        return criteria_weights['subacute_cutaneous_lupus']
+    elif cutaneous_type == 2: #acute cutaneous lupus
+        return criteria_weights['acute_cutaneous_lupus']
+    elif cutaneous_type == 3: #discoid lupus
+        return criteria_weights['discoid_lupus']
+    else:
+        print('Unknown cutaneous type')
 
-def get_renal_biopsy_score(result_class):
-    if (result_class == 3) | (result_class == 4):
-        return 10
-    elif (result_class == 2) | (result_class == 5):
-        return 8
-    else:
-        return 0
 
 def compute_score(state):
     #print(f'state size:{state.shape}')
