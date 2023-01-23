@@ -3,7 +3,6 @@ import numpy as np
 SEED = 42
 GYM_BOX_LOW = -1
 GYM_BOX_HIGH = np.inf
-MAX_STEPS = 10
 CLASS_NUM = 3
 
 CLASS_DICT = {'No lupus':0, 'Lupus':1, 'Inconclusive diagnosis':2} 
@@ -12,8 +11,10 @@ ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', '
 'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'cutaneous_lupus', 'pleural_effusion', 'pericardial_effusion', 'acute_pericarditis', 
 'joint_involvement', 'proteinuria', 'anti_cardioliphin_antibodies', 'anti_β2gp1_antibodies', 'lupus_anti_coagulant', 'low_c3', 'low_c4', 
 'anti_dsdna_antibody', 'anti_smith_antibody']
+
 ACTION_NUM = len(ACTION_SPACE)
 FEATURE_NUM = ACTION_NUM - CLASS_NUM
+MAX_STEPS = FEATURE_NUM + 1
 
 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'],

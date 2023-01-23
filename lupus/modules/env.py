@@ -33,31 +33,35 @@ class LupusEnv(Env):
         self.random = random
 
     def step(self, action):
-        #print('NEW STEP!!!!!!!!!!!!!!!!!!!!')
-        #print(f'Current state: {self.state}')
-        #print(f'action: {action}')
+        # print(f'Step {self.episode_length+1} for index {self.idx}')
+        # print(f'Current state: {self.state}')
         if isinstance(action, np.ndarray):
             #print('CONVERTING ACTION')
             action == int(action)
+        # print(f'action: {action}')
         self.episode_length += 1
         reward = 0
-        if self.episode_length == self.max_steps:
+        if (self.episode_length == self.max_steps) & (action >= self.num_classes):
+            # print(f'maximum steps reached for index: {self.idx}')
             reward -= 1
             self.total_reward -=1
             terminated = True
             done = True
             y_actual = self.y 
             y_pred = int(constants.CLASS_DICT['Inconclusive diagnosis'])
-            is_success = True if y_actual == y_pred else False
-            self.state = self.get_next_state(action - self.num_classes)
-            self.trajectory.append(self.actions[action])
+            # self.trajectory.append(self.actions[action])
             self.trajectory.append('Inconclusive diagnosis')
+            self.state = self.get_next_state(action - self.num_classes)
+            is_success = True if y_actual == y_pred else False
+            
         elif action < self.num_classes: # if diagnosis action
             if action == self.y:
+                # print(f'correct diagnosis action for index: {self.idx}')
                 reward += 1
                 self.total_reward += 1
                 is_success = True
             else:
+                # print(f'incorrect diagnosis action for index: {self.idx}')
                 reward -= 1
                 self.total_reward -= 1
                 is_success = False
@@ -67,6 +71,7 @@ class LupusEnv(Env):
             y_pred = int(action)
             self.trajectory.append(self.actions[action])
         elif self.actions[action] in self.trajectory: #repeated action
+            # print(f'repeated action for index: {self.idx}')
             action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
             reward -= 1
@@ -77,21 +82,22 @@ class LupusEnv(Env):
             is_success = True if y_actual == y_pred else False
             self.trajectory.append(self.actions[action])
         else:
+            # print(f'normal action for index: {self.idx}')
             terminated = False
-            reward += 0
-            self.total_reward += 0
+            reward -= 0
+            self.total_reward -= 0
             done = False
             self.state = self.get_next_state(action - self.num_classes)
             y_actual = np.nan
             y_pred = np.nan
             is_success = None
             self.trajectory.append(self.actions[action])
-        #print(f'Next state: {self.state}')
+        # print(f'Next state: {self.state}')
         
         episode_score = utils.compute_score(self.state) if done else np.nan
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward':self.total_reward, 'y_pred':y_pred, 'y_actual':y_actual, 
         'trajectory':self.trajectory, 'terminated':terminated, 'score':episode_score,'is_success': is_success}
-        #print(f'info: {info}')
+        # print(f'info: {info}')
         return self.state, reward, done, info
 
 
@@ -103,7 +109,7 @@ class LupusEnv(Env):
 
     
     def reset(self, idx=None):
-        #print('RESETTING ENVIRONMENT!!!!!!!!!!!!!!!!!!!!!')
+        # print('RESETTING ENVIRONMENT!!!!!!!!!!!!!!!!!!!!!')
         if idx is not None:
             self.idx = idx
         elif self.random:
@@ -113,6 +119,9 @@ class LupusEnv(Env):
             if self.idx == len(self.X):
                 raise StopIteration()
         self.x, self.y = self.X[self.idx], self.Y[self.idx]
+        # print(f'self.idx: {self.idx}')
+        # print(f'self.x: {self.x}')
+        # print(f'self.y: {self.y}')
         self.state = np.full((constants.FEATURE_NUM,), -1, dtype=np.float32)
         self.trajectory = []
         self.episode_length = 0
