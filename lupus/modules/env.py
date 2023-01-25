@@ -43,8 +43,10 @@ class LupusEnv(Env):
         reward = 0
         if (self.episode_length == self.max_steps) & (action >= self.num_classes):
             # print(f'maximum steps reached for index: {self.idx}')
+            # reward -= 1
+            # self.total_reward -=1
             reward -= 1
-            self.total_reward -=1
+            self.total_reward -= 1
             terminated = True
             done = True
             y_actual = self.y 
@@ -57,11 +59,15 @@ class LupusEnv(Env):
         elif action < self.num_classes: # if diagnosis action
             if action == self.y:
                 # print(f'correct diagnosis action for index: {self.idx}')
+                # reward += 1
+                # self.total_reward += 1
                 reward += 1
                 self.total_reward += 1
                 is_success = True
             else:
                 # print(f'incorrect diagnosis action for index: {self.idx}')
+                # reward -= 1
+                # self.total_reward -= 1
                 reward -= 1
                 self.total_reward -= 1
                 is_success = False
@@ -74,6 +80,8 @@ class LupusEnv(Env):
             # print(f'repeated action for index: {self.idx}')
             action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
+            # reward -= 1
+            # self.total_reward -= 1
             reward -= 1
             self.total_reward -= 1
             done = True
@@ -84,8 +92,14 @@ class LupusEnv(Env):
         else:
             # print(f'normal action for index: {self.idx}')
             terminated = False
+            # reward -= 0
+            # self.total_reward -= 0
+            # if action == self.num_classes:
             reward -= 0
             self.total_reward -= 0
+            # else:
+            # reward -= 1
+            # self.total_reward -= 1
             done = False
             self.state = self.get_next_state(action - self.num_classes)
             y_actual = np.nan

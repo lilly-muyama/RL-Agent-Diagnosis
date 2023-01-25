@@ -375,7 +375,8 @@ def create_sankey_df(df):
 def create_source_and_target(sankey_df, dmap):
     sankey_df['source'] = sankey_df['Label1'].map(dmap)
     sankey_df['target'] = sankey_df['Label2'].map(dmap)
-    sankey_df.sort_values(by=['source'], inplace=True)
+    sankey_df.sort_values(by=['source'], inplace=True) 
+    # sankey_df.sort_values(by=['value'], inplace=True, ascending=False)  ######### DELETE THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return sankey_df
 
 def draw_sankey_diagram(pos_df, neg_df, title, save=False, filename=False):

@@ -14,7 +14,8 @@ ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', '
 
 ACTION_NUM = len(ACTION_SPACE)
 FEATURE_NUM = ACTION_NUM - CLASS_NUM
-MAX_STEPS = FEATURE_NUM + 1
+#MAX_STEPS = FEATURE_NUM + 1
+MAX_STEPS = 20
 
 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'],
