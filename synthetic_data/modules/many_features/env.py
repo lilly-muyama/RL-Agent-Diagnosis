@@ -9,7 +9,7 @@ from gym import Env
 from gym.spaces import Discrete, Box
 from modules.many_features import constants
 
-SEED = 42
+SEED = constants.SEED
 random.seed(SEED)
 np.random.seed(SEED)
 os.environ['PYTHONHASHSEED']=str(SEED)

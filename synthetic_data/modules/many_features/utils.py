@@ -19,6 +19,9 @@ from datetime import datetime
 random.seed(constants.SEED)
 np.random.seed(constants.SEED)
 os.environ['PYTHONHASHSEED']=str(constants.SEED)
+torch.manual_seed(seed)
+torch.use_deterministic_algorithms(True)
+
 
 def load_dqn3(filename, env=None):
     from stable_baselines3 import DQN

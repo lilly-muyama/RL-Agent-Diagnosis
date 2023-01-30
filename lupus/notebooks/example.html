@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "cutaneous_lupus", "label": "cutaneous_lupus", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "delirium", "label": "delirium", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "joint_involvement", "label": "joint_involvement", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "low_c3", "label": "low_c3", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "non_scarring_alopecia", "label": "non_scarring_alopecia", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "ana", "label": "ana", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "fever", "label": "fever", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "Lupus", "label": "Lupus", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anti_smith_antibody", "label": "anti_smith_antibody", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "proteinuria", "label": "proteinuria", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "pericardial_effusion", "label": "pericardial_effusion", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "pleural_effusion", "label": "pleural_effusion", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "psychosis", "label": "psychosis", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anti_dsdna_antibody", "label": "anti_dsdna_antibody", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "seizure", "label": "seizure", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "thrombocytopenia", "label": "thrombocytopenia", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "acute_pericarditis", "label": "acute_pericarditis", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "lupus_anti_coagulant", "label": "lupus_anti_coagulant", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "low_c4", "label": "low_c4", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "oral_ulcers", "label": "oral_ulcers", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anti_\u03b22gp1_antibodies", "label": "anti_\u03b22gp1_antibodies", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "auto_immune_hemolysis", "label": "auto_immune_hemolysis", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "leukopenia", "label": "leukopenia", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "No lupus", "label": "No lupus", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "anti_cardioliphin_antibodies", "label": "anti_cardioliphin_antibodies", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"from": "cutaneous_lupus", "to": "delirium", "value": 14000, "width": 1}, {"from": "delirium", "to": "joint_involvement", "value": 2666, "width": 1}, {"from": "delirium", "to": "low_c3", "value": 11334, "width": 1}, {"from": "joint_involvement", "to": "low_c3", "value": 11126, "width": 1}, {"from": "joint_involvement", "to": "non_scarring_alopecia", "value": 208, "width": 1}, {"from": "joint_involvement", "to": "ana", "value": 885, "width": 1}, {"from": "joint_involvement", "to": "fever", "value": 148, "width": 1}, {"from": "low_c3", "to": "non_scarring_alopecia", "value": 2847, "width": 1}, {"from": "low_c3", "to": "Lupus", "value": 27, "width": 1}, {"from": "non_scarring_alopecia", "to": "fever", "value": 3399, "width": 1}, {"from": "non_scarring_alopecia", "to": "ana", "value": 825, "width": 1}, {"from": "non_scarring_alopecia", "to": "anti_smith_antibody", "value": 7940, "width": 1}, {"from": "non_scarring_alopecia", "to": "proteinuria", "value": 600, "width": 1}, {"from": "non_scarring_alopecia", "to": "Lupus", "value": 75, "width": 1}, {"from": "fever", "to": "anti_smith_antibody", "value": 2530, "width": 1}, {"from": "fever", "to": "pericardial_effusion", "value": 937, "width": 1}, {"from": "fever", "to": "pleural_effusion", "value": 52, "width": 1}, {"from": "fever", "to": "psychosis", "value": 2077, "width": 1}, {"from": "fever", "to": "anti_dsdna_antibody", "value": 3799, "width": 1}, {"from": "fever", "to": "seizure", "value": 120, "width": 1}, {"from": "fever", "to": "thrombocytopenia", "value": 206, "width": 1}, {"from": "fever", "to": "acute_pericarditis", "value": 246, "width": 1}, {"from": "fever", "to": "ana", "value": 3, "width": 1}, {"from": "fever", "to": "lupus_anti_coagulant", "value": 79, "width": 1}, {"from": "fever", "to": "Lupus", "value": 228, "width": 1}, {"from": "fever", "to": "low_c4", "value": 248, "width": 1}, {"from": "fever", "to": "oral_ulcers", "value": 19, "width": 1}, {"from": "fever", "to": "proteinuria", "value": 24, "width": 1}, {"from": "fever", "to": "anti_\u03b22gp1_antibodies", "value": 4, "width": 1}, {"from": "fever", "to": "auto_immune_hemolysis", "value": 2, "width": 1}, {"from": "fever", "to": "leukopenia", "value": 44, "width": 1}, {"from": "fever", "to": "No lupus", "value": 121, "width": 1}, {"from": "fever", "to": "anti_cardioliphin_antibodies", "value": 6, "width": 1}, {"from": "anti_smith_antibody", "to": "proteinuria", "value": 16, "width": 1}, {"from": "anti_smith_antibody", "to": "ana", "value": 256, "width": 1}, {"from": "anti_smith_antibody", "to": "psychosis", "value": 8613, "width": 1}, {"from": "anti_smith_antibody", "to": "acute_pericarditis", "value": 117, "width": 1}, {"from": "anti_smith_antibody", "to": "thrombocytopenia", "value": 11, "width": 1}, {"from": "anti_smith_antibody", "to": "anti_dsdna_antibody", "value": 96, "width": 1}, {"from": "anti_smith_antibody", "to": "anti_\u03b22gp1_antibodies", "value": 29, "width": 1}, {"from": "anti_smith_antibody", "to": "leukopenia", "value": 179, "width": 1}, {"from": "anti_smith_antibody", "to": "pleural_effusion", "value": 45, "width": 1}, {"from": "anti_smith_antibody", "to": "seizure", "value": 46, "width": 1}, {"from": "proteinuria", "to": "pleural_effusion", "value": 25, "width": 1}, {"from": "proteinuria", "to": "psychosis", "value": 659, "width": 1}, {"from": "proteinuria", "to": "ana", "value": 669, "width": 1}, {"from": "proteinuria", "to": "acute_pericarditis", "value": 862, "width": 1}, {"from": "proteinuria", "to": "pericardial_effusion", "value": 93, "width": 1}, {"from": "proteinuria", "to": "lupus_anti_coagulant", "value": 86, "width": 1}, {"from": "proteinuria", "to": "thrombocytopenia", "value": 189, "width": 1}, {"from": "proteinuria", "to": "leukopenia", "value": 244, "width": 1}, {"from": "proteinuria", "to": "Lupus", "value": 66, "width": 1}, {"from": "proteinuria", "to": "anti_dsdna_antibody", "value": 7, "width": 1}, {"from": "proteinuria", "to": "anti_\u03b22gp1_antibodies", "value": 1, "width": 1}, {"from": "proteinuria", "to": "low_c4", "value": 512, "width": 1}, {"from": "proteinuria", "to": "auto_immune_hemolysis", "value": 1, "width": 1}, {"from": "proteinuria", "to": "seizure", "value": 122, "width": 1}, {"from": "proteinuria", "to": "anti_cardioliphin_antibodies", "value": 6, "width": 1}, {"from": "proteinuria", "to": "No lupus", "value": 9, "width": 1}, {"from": "proteinuria", "to": "oral_ulcers", "value": 1, "width": 1}, {"from": "pleural_effusion", "to": "psychosis", "value": 847, "width": 1}, {"from": "pleural_effusion", "to": "low_c4", "value": 1863, "width": 1}, {"from": "pleural_effusion", "to": "anti_cardioliphin_antibodies", "value": 541, "width": 1}, {"from": "pleural_effusion", "to": "seizure", "value": 350, "width": 1}, {"from": "pleural_effusion", "to": "leukopenia", "value": 474, "width": 1}, {"from": "pleural_effusion", "to": "acute_pericarditis", "value": 64, "width": 1}, {"from": "pleural_effusion", "to": "No lupus", "value": 613, "width": 1}, {"from": "pleural_effusion", "to": "lupus_anti_coagulant", "value": 596, "width": 1}, {"from": "pleural_effusion", "to": "thrombocytopenia", "value": 604, "width": 1}, {"from": "pleural_effusion", "to": "anti_\u03b22gp1_antibodies", "value": 189, "width": 1}, {"from": "pleural_effusion", "to": "pericardial_effusion", "value": 93, "width": 1}, {"from": "pleural_effusion", "to": "auto_immune_hemolysis", "value": 148, "width": 1}, {"from": "pleural_effusion", "to": "Lupus", "value": 582, "width": 1}, {"from": "pleural_effusion", "to": "anti_dsdna_antibody", "value": 62, "width": 1}, {"from": "pleural_effusion", "to": "ana", "value": 188, "width": 1}, {"from": "pleural_effusion", "to": "oral_ulcers", "value": 7, "width": 1}, {"from": "psychosis", "to": "seizure", "value": 21, "width": 1}, {"from": "psychosis", "to": "ana", "value": 381, "width": 1}, {"from": "psychosis", "to": "acute_pericarditis", "value": 345, "width": 1}, {"from": "psychosis", "to": "anti_dsdna_antibody", "value": 79, "width": 1}, {"from": "psychosis", "to": "leukopenia", "value": 106, "width": 1}, {"from": "psychosis", "to": "thrombocytopenia", "value": 4, "width": 1}, {"from": "psychosis", "to": "Lupus", "value": 29, "width": 1}, {"from": "psychosis", "to": "pericardial_effusion", "value": 2, "width": 1}, {"from": "psychosis", "to": "auto_immune_hemolysis", "value": 5, "width": 1}, {"from": "psychosis", "to": "anti_cardioliphin_antibodies", "value": 5, "width": 1}, {"from": "psychosis", "to": "low_c4", "value": 2, "width": 1}, {"from": "psychosis", "to": "lupus_anti_coagulant", "value": 1, "width": 1}, {"from": "seizure", "to": "anti_dsdna_antibody", "value": 1890, "width": 1}, {"from": "seizure", "to": "anti_cardioliphin_antibodies", "value": 77, "width": 1}, {"from": "seizure", "to": "pericardial_effusion", "value": 424, "width": 1}, {"from": "seizure", "to": "thrombocytopenia", "value": 523, "width": 1}, {"from": "seizure", "to": "anti_\u03b22gp1_antibodies", "value": 378, "width": 1}, {"from": "seizure", "to": "low_c4", "value": 96, "width": 1}, {"from": "seizure", "to": "acute_pericarditis", "value": 219, "width": 1}, {"from": "seizure", "to": "leukopenia", "value": 357, "width": 1}, {"from": "seizure", "to": "lupus_anti_coagulant", "value": 131, "width": 1}, {"from": "seizure", "to": "Lupus", "value": 517, "width": 1}, {"from": "seizure", "to": "auto_immune_hemolysis", "value": 115, "width": 1}, {"from": "seizure", "to": "ana", "value": 59, "width": 1}, {"from": "seizure", "to": "No lupus", "value": 94, "width": 1}, {"from": "seizure", "to": "oral_ulcers", "value": 2, "width": 1}, {"from": "anti_dsdna_antibody", "to": "pericardial_effusion", "value": 918, "width": 1}, {"from": "anti_dsdna_antibody", "to": "anti_cardioliphin_antibodies", "value": 11, "width": 1}, {"from": "anti_dsdna_antibody", "to": "Lupus", "value": 222, "width": 1}, {"from": "anti_dsdna_antibody", "to": "leukopenia", "value": 7, "width": 1}, {"from": "anti_dsdna_antibody", "to": "anti_\u03b22gp1_antibodies", "value": 283, "width": 1}, {"from": "anti_dsdna_antibody", "to": "lupus_anti_coagulant", "value": 990, "width": 1}, {"from": "anti_dsdna_antibody", "to": "ana", "value": 293, "width": 1}, {"from": "anti_dsdna_antibody", "to": "acute_pericarditis", "value": 5, "width": 1}, {"from": "anti_dsdna_antibody", "to": "low_c4", "value": 54, "width": 1}, {"from": "anti_dsdna_antibody", "to": "thrombocytopenia", "value": 609, "width": 1}, {"from": "anti_dsdna_antibody", "to": "No lupus", "value": 154, "width": 1}, {"from": "anti_dsdna_antibody", "to": "auto_immune_hemolysis", "value": 18, "width": 1}, {"from": "anti_dsdna_antibody", "to": "oral_ulcers", "value": 6, "width": 1}, {"from": "pericardial_effusion", "to": "ana", "value": 7, "width": 1}, {"from": "pericardial_effusion", "to": "anti_\u03b22gp1_antibodies", "value": 337, "width": 1}, {"from": "pericardial_effusion", "to": "Lupus", "value": 666, "width": 1}, {"from": "pericardial_effusion", "to": "low_c4", "value": 106, "width": 1}, {"from": "pericardial_effusion", "to": "lupus_anti_coagulant", "value": 204, "width": 1}, {"from": "pericardial_effusion", "to": "No lupus", "value": 3124, "width": 1}, {"from": "pericardial_effusion", "to": "thrombocytopenia", "value": 59, "width": 1}, {"from": "pericardial_effusion", "to": "acute_pericarditis", "value": 311, "width": 1}, {"from": "pericardial_effusion", "to": "oral_ulcers", "value": 20, "width": 1}, {"from": "pericardial_effusion", "to": "anti_cardioliphin_antibodies", "value": 28, "width": 1}, {"from": "pericardial_effusion", "to": "leukopenia", "value": 3, "width": 1}, {"from": "pericardial_effusion", "to": "auto_immune_hemolysis", "value": 33, "width": 1}, {"from": "ana", "to": "leukopenia", "value": 322, "width": 1}, {"from": "ana", "to": "acute_pericarditis", "value": 1640, "width": 1}, {"from": "ana", "to": "anti_cardioliphin_antibodies", "value": 66, "width": 1}, {"from": "ana", "to": "thrombocytopenia", "value": 62, "width": 1}, {"from": "ana", "to": "lupus_anti_coagulant", "value": 199, "width": 1}, {"from": "ana", "to": "auto_immune_hemolysis", "value": 23, "width": 1}, {"from": "ana", "to": "low_c4", "value": 48, "width": 1}, {"from": "ana", "to": "No lupus", "value": 198, "width": 1}, {"from": "ana", "to": "anti_\u03b22gp1_antibodies", "value": 4, "width": 1}, {"from": "ana", "to": "Lupus", "value": 54, "width": 1}, {"from": "leukopenia", "to": "thrombocytopenia", "value": 653, "width": 1}, {"from": "leukopenia", "to": "acute_pericarditis", "value": 1149, "width": 1}, {"from": "leukopenia", "to": "low_c4", "value": 518, "width": 1}, {"from": "leukopenia", "to": "lupus_anti_coagulant", "value": 187, "width": 1}, {"from": "leukopenia", "to": "anti_cardioliphin_antibodies", "value": 78, "width": 1}, {"from": "leukopenia", "to": "Lupus", "value": 89, "width": 1}, {"from": "leukopenia", "to": "anti_\u03b22gp1_antibodies", "value": 34, "width": 1}, {"from": "leukopenia", "to": "No lupus", "value": 180, "width": 1}, {"from": "leukopenia", "to": "auto_immune_hemolysis", "value": 8, "width": 1}, {"from": "leukopenia", "to": "oral_ulcers", "value": 2, "width": 1}, {"from": "thrombocytopenia", "to": "Lupus", "value": 207, "width": 1}, {"from": "thrombocytopenia", "to": "low_c4", "value": 2622, "width": 1}, {"from": "thrombocytopenia", "to": "acute_pericarditis", "value": 6, "width": 1}, {"from": "thrombocytopenia", "to": "lupus_anti_coagulant", "value": 18, "width": 1}, {"from": "thrombocytopenia", "to": "auto_immune_hemolysis", "value": 30, "width": 1}, {"from": "thrombocytopenia", "to": "anti_\u03b22gp1_antibodies", "value": 36, "width": 1}, {"from": "thrombocytopenia", "to": "No lupus", "value": 89, "width": 1}, {"from": "thrombocytopenia", "to": "anti_cardioliphin_antibodies", "value": 2, "width": 1}, {"from": "thrombocytopenia", "to": "oral_ulcers", "value": 2, "width": 1}, {"from": "Lupus", "to": "anti_cardioliphin_antibodies", "value": 579, "width": 1}, {"from": "Lupus", "to": "anti_\u03b22gp1_antibodies", "value": 659, "width": 1}, {"from": "Lupus", "to": "oral_ulcers", "value": 312, "width": 1}, {"from": "Lupus", "to": "lupus_anti_coagulant", "value": 981, "width": 1}, {"from": "Lupus", "to": "auto_immune_hemolysis", "value": 1010, "width": 1}, {"from": "Lupus", "to": "low_c4", "value": 814, "width": 1}, {"from": "Lupus", "to": "acute_pericarditis", "value": 124, "width": 1}, {"from": "acute_pericarditis", "to": "low_c4", "value": 23, "width": 1}, {"from": "acute_pericarditis", "to": "anti_\u03b22gp1_antibodies", "value": 33, "width": 1}, {"from": "acute_pericarditis", "to": "anti_cardioliphin_antibodies", "value": 30, "width": 1}, {"from": "acute_pericarditis", "to": "auto_immune_hemolysis", "value": 49, "width": 1}, {"from": "acute_pericarditis", "to": "oral_ulcers", "value": 18, "width": 1}, {"from": "acute_pericarditis", "to": "No lupus", "value": 34, "width": 1}, {"from": "acute_pericarditis", "to": "lupus_anti_coagulant", "value": 10, "width": 1}, {"from": "low_c4", "to": "lupus_anti_coagulant", "value": 542, "width": 1}, {"from": "low_c4", "to": "No lupus", "value": 206, "width": 1}, {"from": "low_c4", "to": "anti_cardioliphin_antibodies", "value": 295, "width": 1}, {"from": "low_c4", "to": "auto_immune_hemolysis", "value": 112, "width": 1}, {"from": "low_c4", "to": "anti_\u03b22gp1_antibodies", "value": 248, "width": 1}, {"from": "low_c4", "to": "oral_ulcers", "value": 2, "width": 1}, {"from": "anti_cardioliphin_antibodies", "to": "lupus_anti_coagulant", "value": 29, "width": 1}, {"from": "anti_cardioliphin_antibodies", "to": "anti_\u03b22gp1_antibodies", "value": 937, "width": 1}, {"from": "anti_cardioliphin_antibodies", "to": "auto_immune_hemolysis", "value": 242, "width": 1}, {"from": "anti_cardioliphin_antibodies", "to": "No lupus", "value": 619, "width": 1}, {"from": "anti_cardioliphin_antibodies", "to": "oral_ulcers", "value": 2, "width": 1}, {"from": "anti_\u03b22gp1_antibodies", "to": "No lupus", "value": 316, "width": 1}, {"from": "anti_\u03b22gp1_antibodies", "to": "lupus_anti_coagulant", "value": 120, "width": 1}, {"from": "anti_\u03b22gp1_antibodies", "to": "auto_immune_hemolysis", "value": 434, "width": 1}, {"from": "anti_\u03b22gp1_antibodies", "to": "oral_ulcers", "value": 28, "width": 1}, {"from": "lupus_anti_coagulant", "to": "No lupus", "value": 259, "width": 1}, {"from": "lupus_anti_coagulant", "to": "auto_immune_hemolysis", "value": 10, "width": 1}, {"from": "lupus_anti_coagulant", "to": "oral_ulcers", "value": 4, "width": 1}, {"from": "No lupus", "to": "oral_ulcers", "value": 295, "width": 1}, {"from": "No lupus", "to": "auto_immune_hemolysis", "value": 448, "width": 1}, {"from": "auto_immune_hemolysis", "to": "oral_ulcers", "value": 113, "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

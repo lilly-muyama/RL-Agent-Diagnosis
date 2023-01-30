@@ -50,7 +50,8 @@ class LupusEnv(Env):
             terminated = True
             done = True
             y_actual = self.y 
-            y_pred = int(constants.CLASS_DICT['Inconclusive diagnosis'])
+            #y_pred = int(constants.CLASS_DICT['Inconclusive diagnosis'])
+            y_pred = 2
             # self.trajectory.append(self.actions[action])
             self.trajectory.append('Inconclusive diagnosis')
             self.state = self.get_next_state(action - self.num_classes)
@@ -78,7 +79,7 @@ class LupusEnv(Env):
             self.trajectory.append(self.actions[action])
         elif self.actions[action] in self.trajectory: #repeated action
             # print(f'repeated action for index: {self.idx}')
-            action = constants.CLASS_DICT['Inconclusive diagnosis']
+            # action = constants.CLASS_DICT['Inconclusive diagnosis']
             terminated = True
             # reward -= 1
             # self.total_reward -= 1
@@ -86,20 +87,18 @@ class LupusEnv(Env):
             self.total_reward -= 1
             done = True
             y_actual = self.y 
-            y_pred = int(action)
+            # y_pred = int(action)
+            y_pred = 2
             is_success = True if y_actual == y_pred else False
-            self.trajectory.append(self.actions[action])
+            # self.trajectory.append(self.actions[action])
+            self.trajectory.append('Inconclusive diagnosis')
         else:
             # print(f'normal action for index: {self.idx}')
             terminated = False
             # reward -= 0
             # self.total_reward -= 0
-            # if action == self.num_classes:
             reward -= 0
             self.total_reward -= 0
-            # else:
-            # reward -= 1
-            # self.total_reward -= 1
             done = False
             self.state = self.get_next_state(action - self.num_classes)
             y_actual = np.nan
@@ -108,11 +107,20 @@ class LupusEnv(Env):
             self.trajectory.append(self.actions[action])
         # print(f'Next state: {self.state}')
         
-        episode_score = utils.compute_score(self.state) if done else np.nan
+        episode_score = utils.compute_score(self.state) if done else np.nan  #put this back
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward':self.total_reward, 'y_pred':y_pred, 'y_actual':y_actual, 
         'trajectory':self.trajectory, 'terminated':terminated, 'score':episode_score,'is_success': is_success}
         # print(f'info: {info}')
         return self.state, reward, done, info
+
+    # def get_step_action_reward(self, action):
+    #     string_action = self.actions[action]
+    #     if string_action == 'cutaneous_lupus':
+    #         action_reward = 5/10
+    #     else:
+    #         action_weight = constants.CRITERIA_WEIGHTS[string_action]
+    #         action_reward = action_weight/10
+    #     return action_reward
 
 
     def render(self):

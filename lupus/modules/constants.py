@@ -1,21 +1,28 @@
-import numpy as np
-
+import numpy as np 
 SEED = 42
 GYM_BOX_LOW = -1
 GYM_BOX_HIGH = np.inf
-CLASS_NUM = 3
+# CLASS_NUM = 2
+# CLASS_NUM = 3
 
 CLASS_DICT = {'No lupus':0, 'Lupus':1, 'Inconclusive diagnosis':2} 
+# CLASS_DICT = {'No lupus':0, 'lupus':1}
 
 ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium', 
 'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'cutaneous_lupus', 'pleural_effusion', 'pericardial_effusion', 'acute_pericarditis', 
 'joint_involvement', 'proteinuria', 'anti_cardioliphin_antibodies', 'anti_β2gp1_antibodies', 'lupus_anti_coagulant', 'low_c3', 'low_c4', 
 'anti_dsdna_antibody', 'anti_smith_antibody']
 
+# ACTION_SPACE = ['No lupus', 'Lupus', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium', 
+# 'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'cutaneous_lupus', 'pleural_effusion', 'pericardial_effusion', 'acute_pericarditis', 
+# 'joint_involvement', 'proteinuria', 'anti_cardioliphin_antibodies', 'anti_β2gp1_antibodies', 'lupus_anti_coagulant', 'low_c3', 'low_c4', 
+# 'anti_dsdna_antibody', 'anti_smith_antibody']
+
+CLASS_NUM = len(CLASS_DICT)
 ACTION_NUM = len(ACTION_SPACE)
 FEATURE_NUM = ACTION_NUM - CLASS_NUM
-#MAX_STEPS = FEATURE_NUM + 1
-MAX_STEPS = 20
+MAX_STEPS = FEATURE_NUM + 1
+#MAX_STEPS = 20
 
 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'],

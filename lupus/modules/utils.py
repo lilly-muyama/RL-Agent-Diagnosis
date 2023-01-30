@@ -23,23 +23,23 @@ random.seed(constants.SEED)
 np.random.seed(constants.SEED)
 os.environ['PYTHONHASHSEED']=str(constants.SEED)
 
-def get_domain_score(row, domain):
-    domain_features = domains_feat_dict[domain]
-    domain_score = 0
-    if domain == 'complement_proteins':
-        domain_score = get_c3_c4_score(row.c3, row.c4)
-        domain_features = list(set(domain_features) - set(['c3', 'c4']))
-    for feat in domain_features:
-        if feat == 'renal_biopsy_class': # to delete
-            pass
-        else:
-            if row[feat] >= 0:
-                feat_score = get_feat_score(row, feat)
-                if feat_score > domain_score:
-                    domain_score = feat_score
-    if domain_score > domains_max_scores_dict[domain]:
-        raise Exception('The score is too large for this domain!')
-    return domain_score
+# def get_domain_score(row, domain):
+#     domain_features = domains_feat_dict[domain]
+#     domain_score = 0
+#     if domain == 'complement_proteins':
+#         domain_score = get_c3_c4_score(row.c3, row.c4)
+#         domain_features = list(set(domain_features) - set(['c3', 'c4']))
+#     for feat in domain_features:
+#         if feat == 'renal_biopsy_class': # to delete
+#             pass
+#         else:
+#             if row[feat] >= 0:
+#                 feat_score = get_feat_score(row, feat)
+#                 if feat_score > domain_score:
+#                     domain_score = feat_score
+#     if domain_score > domains_max_scores_dict[domain]:
+#         raise Exception('The score is too large for this domain!')
+#     return domain_score
 
 def get_domain_score(row, domain):
     domain_features = domains_feat_dict[domain]
@@ -189,10 +189,13 @@ def load_dqn3(filename, env=None):
     return model
 
 def evaluate_dqn(dqn_model, X_test, y_test):
+    # print('Evaluating dqn')
+    # print('creating empty dataframe')
     test_df = pd.DataFrame()
+    # print('creating testing environment')
     env = create_env(X_test, y_test, random=False)
     count=0
-
+    # print('try statement')
     try:
         while True:
             count+=1
