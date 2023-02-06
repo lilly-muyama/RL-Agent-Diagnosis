@@ -16,7 +16,8 @@ class LupusEnv(Env):
     def __init__(self, X, Y, random=True):
         super(LupusEnv, self).__init__()
         self.action_space = Discrete(constants.ACTION_NUM)
-        self.observation_space = Box(constants.GYM_BOX_LOW, constants.GYM_BOX_HIGH, (constants.FEATURE_NUM,))
+        # self.observation_space = Box(constants.GYM_BOX_LOW, constants.GYM_BOX_HIGH, (constants.FEATURE_NUM,))
+        self.observation_space = Box(0, 1.5, (constants.FEATURE_NUM,))
         self.actions = constants.ACTION_SPACE
         self.max_steps = constants.MAX_STEPS
         self.X = X
@@ -107,9 +108,9 @@ class LupusEnv(Env):
             self.trajectory.append(self.actions[action])
         # print(f'Next state: {self.state}')
         
-        episode_score = utils.compute_score(self.state) if done else np.nan  #put this back
+        # episode_score = utils.compute_score(self.state) if done else np.nan  #put this back
         info = {'index': self.idx, 'episode_length':self.episode_length, 'reward':self.total_reward, 'y_pred':y_pred, 'y_actual':y_actual, 
-        'trajectory':self.trajectory, 'terminated':terminated, 'score':episode_score,'is_success': is_success}
+        'trajectory':self.trajectory, 'terminated':terminated, 'score':0,'is_success': is_success}
         # print(f'info: {info}')
         return self.state, reward, done, info
 
