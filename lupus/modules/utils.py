@@ -178,9 +178,54 @@ def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None):
     env.close()
     return model
 
+def stable_dqn(X_train, y_train, timesteps, save=False, filename=None):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3)')
+    training_env = create_env(X_train, y_train)
+    training_env = bench.Monitor(training_env, logger.get_dir())
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model.learn(total_timesteps=timesteps, log_interval=10000)
+    if save:
+        model.save(f'{filename}.pkl')
+    env.close()
+    return model
+
 def create_env(X, y, random=True):
     env = LupusEnv(X, y, random)
     return env
+
+def create_stable_dqn(X_train, y_train):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    import tensorflow
+
+    tensorflow.set_random_seed(constants.SEED)
+    
+    training_env = create_env(X_train, y_train)
+    training_env = bench.Monitor(training_env, logger.get_dir())
+    print('Using new DQN')
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000,
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, prioritized_replay=True, n_cpu_tf_sess=1)
+    return model
+    
+def create_stable_acktr(X_train, y_train):
+    from stable_baselines import ACKTR
+    from stable_baselines import bench, logger
+    import tensorflow
+
+    tensorflow.set_random_seed(constants.SEED)
+
+    training_env = create_env(X_train, y_train)
+    training_env = bench.Monitor(training_env, logger.get_dir())
+    model = ACKTR('MlpPolicy', training_env, verbose=1, seed = constants.SEED, n_cpu_tf_sess=1)
+    return model
+
+
+
 
 def load_dqn3(filename, env=None):
     from stable_baselines3 import DQN

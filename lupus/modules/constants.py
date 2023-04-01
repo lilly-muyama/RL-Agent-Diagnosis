@@ -3,9 +3,10 @@ SEED = 42
 
 # STEP_REWARD = -1
 CORRECT_DIAGNOSIS_REWARD = 1
-INCORRECT_DIAGNOSIS_REWARD = -2
+INCORRECT_DIAGNOSIS_REWARD = -1
 REPEATED_ACTION_REWARD = -1
 MAX_LENGTH_REWARD = -1
+STEP_REWARD = -1/30
 
 ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium',
 'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'cutaneous_lupus', 'pleural_effusion', 'pericardial_effusion', 'acute_pericarditis',

@@ -5,6 +5,7 @@ import copy
 import random
 import numpy as np
 import pandas as pd
+import gym
 from gym import Env
 from gym.spaces import Discrete, Box
 from modules.many_features import constants
@@ -36,7 +37,12 @@ class SyntheticEnv(Env):
         self.trajectory = []
         self.total_reward = 0
         self.random = random
-        
+        self.seed()
+
+    def seed(self, seed=SEED):
+        self.np_random, seed = gym.utils.seeding.np_random(seed)
+        return [seed]
+
     
     def step(self, action):
         #print(f'type: {type(action)}')

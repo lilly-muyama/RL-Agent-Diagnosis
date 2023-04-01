@@ -2,7 +2,8 @@ import os
 import random
 import copy
 import numpy as np
-from modules import constants, utils
+from modules import constants
+import gym
 from gym import Env
 from gym.spaces import Discrete, Box
 
@@ -20,7 +21,9 @@ class LupusEnv(Env):
         self.feat_num = self.X.shape[1]
         self.actions = constants.ACTION_SPACE
         self.action_space = Discrete(len(self.actions))
-        self.observation_space = Box(0, 1.5, (self.feat_num,))
+        #self.action_space = Discrete(len(data['col'].unique()))
+        # self.action_space = Box(low=0, high=1, shape=(len(self.actions),))
+        self.observation_space = Box(0, 3, (self.feat_num,))
         # self.max_steps = constants.MAX_STEPS
         self.random = random
         self.sample_num = len(X)
@@ -32,10 +35,16 @@ class LupusEnv(Env):
         self.episode_length = 0
         self.trajectory = []
         self.total_reward = 0
+        self.seed()
+
+    def seed(self, seed=constants.SEED):
+        self.np_random, seed = gym.utils.seeding.np_random(seed)
+        return [seed]
         
 
     def step(self, action):
         if isinstance(action, np.ndarray):
+            # print(action)
             action == int(action)
         self.episode_length += 1
         reward = 0
@@ -66,15 +75,8 @@ class LupusEnv(Env):
             self.trajectory.append('Inconclusive diagnosis')
 
         else:
-            if (self.actions[action] == 'ana') & (self.episode_length==1):
-                reward += 1
-                self.total_reward+=1
-            elif self.actions[action] == 'ana':
-                reward += 0
-                self.total_reward+=0
-            else:
-                reward += -1/12
-                self.total_reward += -1/12
+            reward += constants.STEP_REWARD
+            self.total_reward += constants.STEP_REWARD
             terminated = False
             done = False
             y_actual = np.nan
@@ -102,7 +104,7 @@ class LupusEnv(Env):
             self.idx = random.randint(0, self.sample_num-1)
         else:
             self.idx += 1
-            if self.idx == self.sample_num:
+            if self.idx >= self.sample_num:
                 raise StopIteration()
         self.x, self.y = self.X[self.idx], self.Y[self.idx]
         self.state = np.full((self.feat_num,), -1, dtype=np.float32)
