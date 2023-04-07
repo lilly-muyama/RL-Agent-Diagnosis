@@ -40,36 +40,125 @@ def create_env(X, y, random=True):
     env = SyntheticEnv(X, y, random)
     return env
 
-def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None):
+def stable_dqn3(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'dqn3_basic'):
     from stable_baselines3 import DQN
+    from stable_baselines3.common.callbacks import CheckpointCallback
     print('using stable baselines 3')
     torch.manual_seed(constants.SEED)
     torch.use_deterministic_algorithms(True)
 
     env = create_env(X_train, y_train)
     model = DQN('MlpPolicy', env, verbose=1, seed=constants.SEED)
-    model.learn(total_timesteps=timesteps, log_interval=100000)
+    checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=100000, callback=checkpoint_callback)
     if save:
         model.save(filename)
     env.close()
     return model
 
 
-def stable_dqn(X_train, y_train, timesteps, save=False, filename=None):
+def stable_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'dqn_basic'):
     from stable_baselines import DQN
     from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
     import tensorflow
     tensorflow.set_random_seed(constants.SEED)
 
     print('using just stable baselines (not 3)')
     training_env = create_env(X_train, y_train)
-    env = bench.Monitor(training_env, logger.get_dir())
-    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
-    model.learn(total_timesteps=timesteps, log_interval=10000)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1)
+    # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
     if save:
         model.save(f'{filename}.pkl')
-    env.close()
+    training_env.close()
     return model
+    
+def stable_dueling_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'dqn_basic'):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3)')
+    training_env = create_env(X_train, y_train)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, double_q=False, prioritized_replay=True)
+    # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+
+def stable_double_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'ddqn_basic'):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3)')
+    training_env = create_env(X_train, y_train)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, policy_kwargs=dict(dueling=False),
+                prioritized_replay=True)
+    # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+
+def stable_vanilla_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'vanilla_dqn'):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3)')
+    training_env = create_env(X_train, y_train)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.01, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, policy_kwargs=dict(dueling=False),
+                double_q=False)
+    # checkpoint_callback = CheckpointCallback(save_freq=100000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=50000)#, callback=checkpoint_callback)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+
+def stable_prioritized_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'vanilla_dqn'):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3)')
+    training_env = create_env(X_train, y_train)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=True)
+    # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+    
 
 def evaluate_dqn(dqn_model, X_test, y_test):
     test_df = pd.DataFrame()
@@ -79,8 +168,8 @@ def evaluate_dqn(dqn_model, X_test, y_test):
     try:
         while True:
             count+=1
-            if count%(len(X_test)/5)==0:
-                print(f'Count: {count}')
+            # if count%(len(X_test)/5)==0:
+            #     print(f'Count: {count}')
             obs, done = env.reset(), False
             while not done:
                 action, _states = dqn_model.predict(obs, deterministic=True)
@@ -144,7 +233,7 @@ def test(ytest, ypred):
         roc_auc = multiclass(ytest, ypred)
     except:
         roc_auc = None
-    return acc, f1, roc_auc
+    return acc*100, f1*100, roc_auc*100
 
 def test_dt(model, Xtest, ytest):
     ypred = model.predict(Xtest)

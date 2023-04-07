@@ -1,5 +1,5 @@
 import numpy as np 
-SEED = 42
+SEED = 84
 
 # STEP_REWARD = -1
 CORRECT_DIAGNOSIS_REWARD = 1

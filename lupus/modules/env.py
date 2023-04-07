@@ -23,7 +23,7 @@ class LupusEnv(Env):
         self.action_space = Discrete(len(self.actions))
         #self.action_space = Discrete(len(data['col'].unique()))
         # self.action_space = Box(low=0, high=1, shape=(len(self.actions),))
-        self.observation_space = Box(0, 3, (self.feat_num,))
+        self.observation_space = Box(np.inf, np.inf, (self.feat_num,))
         # self.max_steps = constants.MAX_STEPS
         self.random = random
         self.sample_num = len(X)
