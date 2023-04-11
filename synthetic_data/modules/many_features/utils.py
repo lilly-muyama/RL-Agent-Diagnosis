@@ -129,9 +129,9 @@ def stable_vanilla_dqn(X_train, y_train, timesteps, save=False, filename=None, c
     training_env = create_env(X_train, y_train)
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
-    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.01, buffer_size=1000000, learning_starts=50000, 
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
                 train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, policy_kwargs=dict(dueling=False),
-                double_q=False)
+                double_q=False, prioritized_replay=True)
     # checkpoint_callback = CheckpointCallback(save_freq=100000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
     model.learn(total_timesteps=timesteps, log_interval=50000)#, callback=checkpoint_callback)
     if save:
@@ -380,12 +380,23 @@ def draw_sankey_diagram(pos_df, neg_df, title, save=False, filename=False):
     value = list(pos_sankey_df['value']) + list(neg_sankey_df['value'])
     source = list(pos_sankey_df['source']) + list(neg_sankey_df['source'])
     link_color = ['green']*len(pos_sankey_df) + ['red']*len(neg_sankey_df)
+#     layout = go.Layout(
+
+# )
     fig = go.Figure(data=[go.Sankey(
         node = dict(pad=15, thickness=20, line=dict(color='black', width=0.5), label=label, color=nodes_color),
         link= dict(source=source, target=target, value=value, color=link_color)
     )])
-    fig.update_layout(title_text=title, title_x=0.5,  title_font_size=24, title_font_color='black', 
-                      title_font_family='Times New Roman')
+    fig.update_layout(title_text=title, 
+                      title_x=0.5,  
+                      title_font_size=24, 
+                      title_font_color='black', 
+                      title_font_family='Times New Roman', 
+                      font = dict(family='Times New Roman', size=38),
+                      paper_bgcolor='rgba(0, 0, 0, 0)',
+                      plot_bgcolor='rgba(0, 0, 0, 0)'
+                      )
+    
     if save:
         fig.write_html(f'{filename}.html')
     fig.show()
