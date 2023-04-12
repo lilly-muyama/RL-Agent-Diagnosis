@@ -84,12 +84,32 @@ def stable_dueling_dqn(X_train, y_train, timesteps, save=False, filename=None, c
     import tensorflow
     tensorflow.set_random_seed(constants.SEED)
 
-    print('using just stable baselines (not 3)')
+    print('using just stable baselines (not 3) - dueling dqn')
     training_env = create_env(X_train, y_train)
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
     model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
                 train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, double_q=False, prioritized_replay=True)
+    # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+
+def stable_dueling_ddqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'dqn_basic'):
+    from stable_baselines import DQN
+    from stable_baselines import bench, logger
+    from stable_baselines.common.callbacks import CheckpointCallback
+    import tensorflow
+    tensorflow.set_random_seed(constants.SEED)
+
+    print('using just stable baselines (not 3) - dueling double dqn')
+    training_env = create_env(X_train, y_train)
+    # training_env = bench.Monitor(training_env, logger.get_dir())
+    # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=True)
     # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
     model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
     if save:
@@ -104,7 +124,7 @@ def stable_double_dqn(X_train, y_train, timesteps, save=False, filename=None, ch
     import tensorflow
     tensorflow.set_random_seed(constants.SEED)
 
-    print('using just stable baselines (not 3)')
+    print('using just stable baselines (not 3) - double dqn')
     training_env = create_env(X_train, y_train)
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
@@ -125,7 +145,7 @@ def stable_vanilla_dqn(X_train, y_train, timesteps, save=False, filename=None, c
     import tensorflow
     tensorflow.set_random_seed(constants.SEED)
 
-    print('using just stable baselines (not 3)')
+    print('using just stable baselines (not 3) - standard dqn')
     training_env = create_env(X_train, y_train)
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
@@ -284,7 +304,7 @@ def generate_nans(df, column_list, frac):
     #simulating missing values in the data, frac can be a float or a list of floats same length as column_list
     for i, col in enumerate(column_list):
         if isinstance(frac, float):
-            vals_to_nan = df[col].dropna().sample(frac=frac, random_state=42).index
+            vals_to_nan = df[col].dropna().sample(frac=frac, random_state=constants.SEED).index
         elif instance(frac, list) & (len(column_list)==len(frac)):
             vals_to_nan = df[col].dropna().sample(frac=frac[i]).index
         elif len(column_list) != len(frac):

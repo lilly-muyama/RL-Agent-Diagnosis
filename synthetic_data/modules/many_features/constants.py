@@ -1,4 +1,4 @@
-SEED = 0
+SEED = 105
 MAX_STEPS = 10
 
 
