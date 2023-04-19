@@ -69,7 +69,7 @@ def stable_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoin
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
     model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
-                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1)
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=True)
     # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
     model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
     if save:
@@ -129,7 +129,7 @@ def stable_double_dqn(X_train, y_train, timesteps, save=False, filename=None, ch
     # training_env = bench.Monitor(training_env, logger.get_dir())
     # model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
     model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
-                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, policy_kwargs=dict(dueling=False),
+                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, policy_kwargs=dict(dueling=False), 
                 prioritized_replay=True)
     # checkpoint_callback = CheckpointCallback(save_freq=500000, save_path=checkpoint_folder, name_prefix=checkpoint_prefix)
     model.learn(total_timesteps=timesteps, log_interval=10000)#, callback=checkpoint_callback)
@@ -487,14 +487,17 @@ def show_values(pc, fmt="%.2f", **kw):
 
 def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=40, figure_height=20, correct_orientation=False, cmap='RdBu'):
     fig, ax = plt.subplots()    
+    title_font = {'fontname':'Arial', 'size':'16', 'color':'black', 'weight':'normal',
+              'verticalalignment':'bottom'} # Bottom vertical alignment for more space
+    axis_font = {'fontname':'Arial', 'size':'14'}
     c = ax.pcolor(AUC, edgecolors='k', linestyle= 'dashed', linewidths=0.2, cmap=cmap)
     ax.set_yticks(np.arange(AUC.shape[0]) + 0.5, minor=False)
     ax.set_xticks(np.arange(AUC.shape[1]) + 0.5, minor=False)
     ax.set_xticklabels(xticklabels, minor=False)
     ax.set_yticklabels(yticklabels, minor=False)
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)      
+    plt.title(title, **title_font)
+    plt.xlabel(xlabel, **axis_font)
+    plt.ylabel(ylabel, **axis_font)      
 
     # Remove last blank column
     plt.xlim( (0, AUC.shape[1]) )
@@ -548,7 +551,7 @@ def plot_classification_report(y_actual, y_pred, save=False, filename=False, cma
     figure_width = 25
     figure_height = len(class_names) + 7
     correct_orientation = False
-    heatmap(np.array(plotMat), 'classification report', xlabel, ylabel, xticklabels, yticklabels, figure_width, figure_height, correct_orientation, cmap=cmap)
+    heatmap(np.array(plotMat), 'Classification Report', xlabel, ylabel, xticklabels, yticklabels, figure_width, figure_height, correct_orientation, cmap=cmap)
     #plt.tight_layout()
     if save:
         plt.savefig(filename, bbox_inches = 'tight')
