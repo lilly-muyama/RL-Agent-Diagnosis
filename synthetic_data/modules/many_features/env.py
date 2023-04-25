@@ -17,6 +17,7 @@ os.environ['PYTHONHASHSEED']=str(SEED)
 
 
 
+
 class SyntheticEnv(Env):
     def __init__(self, X, Y, random=True):
         super(SyntheticEnv, self).__init__()

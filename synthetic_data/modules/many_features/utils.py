@@ -495,9 +495,9 @@ def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=4
     ax.set_xticks(np.arange(AUC.shape[1]) + 0.5, minor=False)
     ax.set_xticklabels(xticklabels, minor=False)
     ax.set_yticklabels(yticklabels, minor=False)
-    plt.title(title, **title_font)
-    plt.xlabel(xlabel, **axis_font)
-    plt.ylabel(ylabel, **axis_font)      
+    # plt.title(title, **title_font)
+    # plt.xlabel(xlabel, **axis_font)
+    # plt.ylabel(ylabel, **axis_font)      
 
     # Remove last blank column
     plt.xlim( (0, AUC.shape[1]) )
