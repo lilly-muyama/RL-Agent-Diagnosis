@@ -76,7 +76,7 @@ def stable_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoin
         model.save(f'{filename}.pkl')
     training_env.close()
     return model
-    
+
 def stable_dueling_dqn(X_train, y_train, timesteps, save=False, filename=None, checkpoint_folder=None, checkpoint_prefix = 'dqn_basic'):
     from stable_baselines import DQN
     from stable_baselines import bench, logger
@@ -178,7 +178,7 @@ def stable_prioritized_dqn(X_train, y_train, timesteps, save=False, filename=Non
         model.save(f'{filename}.pkl')
     training_env.close()
     return model
-    
+
 
 def evaluate_dqn(dqn_model, X_test, y_test):
     test_df = pd.DataFrame()
