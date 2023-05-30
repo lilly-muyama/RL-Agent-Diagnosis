@@ -400,3 +400,22 @@ def create_sankey(df, class_list, title, save=False, filename=False):
         dfs_list.append(df[df.y_pred==diag_class])
     
     draw_sankey_diagram(dfs_list, title, save, filename)
+
+
+################################################################### OTHER ############################################################################
+def generate_nans(df, column_list, frac):
+    #simulating missing values in the data, frac can be a float or a list of floats same length as column_list
+    for i, col in enumerate(column_list):
+        if isinstance(frac, float):
+            vals_to_nan = df[col].dropna().sample(frac=frac, random_state=constants.SEED).index
+        elif isinstance(frac, list) & (len(column_list)==len(frac)):
+            vals_to_nan = df[col].dropna().sample(frac=frac[i]).index
+        elif len(column_list) != len(frac):
+            print('The column and frac lists should be of the same length')
+            return
+        else:
+            print('I have no idea what is happening :)')
+            return
+        df.loc[vals_to_nan, col] = np.nan
+    return df
+
