@@ -7,10 +7,10 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=REQUEUE
 
-#SBATCH --job-name=risk_factor_trial 
+#SBATCH --job-name=biopsy_with_cost_7 
 #SBATCH --nodes=1                
-#SBATCH --ntasks=1              
-#SBATCH --cpus-per-task=32 
+#SBATCH --ntasks=1             
+#SBATCH --cpus-per-task=8 
 #SBATCH --partition=cpu_devel        
 #SBATCH --mem=128G               
 #SBATCH --hint=multithread     

@@ -14,6 +14,7 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 import xgboost
+from scipy.stats import hmean
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.metrics import confusion_matrix, classification_report
@@ -97,6 +98,33 @@ def compute_score(state):
         total_row_score += domain_score
     return total_row_score
 
+def get_pathway_score(pathway):
+    if isinstance(pathway, str):
+        pathway = ast.literal_eval(pathway)
+    total_feature_cost = 0
+    for feat in pathway[:-1]:
+        feat_score = constants.FEATURE_SCORES[feat]
+        total_feature_cost += feat_score
+    return total_feature_cost
+
+def total_pathway_score(test_df):
+    total_score = 0
+    for i, row in test_df.iterrows():
+        # try:
+        row_feature_score = get_pathway_score(row.trajectory)
+        total_row_score = 1-(row_feature_score/constants.MAX_FEATURE_SCORE)
+        total_score += total_row_score
+        
+    return (total_score/len(test_df))*100
+
+def pahm_score(acc, pathway_score):
+    pathway_acc_harmonic_mean = 2*(acc*pathway_score)/(acc+pathway_score) #mean could be replaced by index hence pahi for the metric name
+    return pathway_acc_harmonic_mean
+
+def weighted_pahm_score(numbers, weights): #both are list of the same length
+    whm = (weights[0] + weights[1]) / ((weights[0] / numbers[0]) + (weights[1] / numbers[1]))
+    return whm
+
 ################################################################### DQN FUNCTIONS #####################################################################
 
 def load_dqn(filename, env=None):
@@ -139,7 +167,7 @@ def stable_dueling_dqn(X_train, y_train, timesteps, save=False, log_path=None, l
     if per:
         log_prefix = 'dueling_dqn_per'
     training_env = create_env(X_train, y_train)
-    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=2000000, learning_starts=50000, 
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
                 train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, double_q=False, prioritized_replay=per)
     
     checkpoint_callback = CheckpointCallback(save_freq=constants.CHECKPOINT_FREQ, save_path=log_path, name_prefix=log_prefix)
@@ -156,7 +184,7 @@ def stable_dueling_ddqn(X_train, y_train, timesteps, save=False, log_path=None, 
     if per:
         log_prefix = 'dueling_ddqn_per'
     training_env = create_env(X_train, y_train)
-    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=2000000, learning_starts=50000, 
+    model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
                 train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=per)
     
     checkpoint_callback = CheckpointCallback(save_freq=constants.CHECKPOINT_FREQ, save_path=log_path, name_prefix=log_prefix)
@@ -219,12 +247,15 @@ def get_val_metrics(model, validation_env):
     except StopIteration:
         pass
     acc, f1, roc_auc, = test(val_df['y_actual'], val_df['y_pred'])
+    pathway_score = total_pathway_score(val_df)
+    pathway_acc_harmonic_mean_score = pahm_score(acc, pathway_score)
+    wpahm_score = weighted_pahm_score([acc, pathway_score], [0.7, 0.3])
     min_path_length = val_df.episode_length.min()
     average_path_length = val_df.episode_length.mean()
     max_path_length = val_df.episode_length.max()
     min_sample_pathway = val_df[val_df.episode_length==min_path_length].trajectory.iloc[0]
     max_sample_pathway = val_df[val_df.episode_length==max_path_length].trajectory.iloc[0]
-    return acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
+    return pathway_score, pathway_acc_harmonic_mean_score, wpahm_score, acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
 
 ############################################################### OTHER MODELS ###################################################################
 

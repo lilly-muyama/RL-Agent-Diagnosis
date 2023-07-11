@@ -16,7 +16,7 @@ from multiprocessing import Process
 def run_dqn_model(model_type, seed, steps):
     # dir_name = f'seed_{seed}_{steps}'
     dir_name = f'seed_{seed}_{steps}'
-    parent_dir = f'../models/logs/{model_type}/risk_factor'
+    parent_dir = f'../models/logs/{model_type}/biopsy_2.5'
     path = os.path.join(parent_dir, dir_name)
     os.mkdir(path)
   
@@ -43,7 +43,7 @@ def run_dqn_model(model_type, seed, steps):
 
 
 if __name__ == '__main__':
-    train_df = pd.read_csv('../data/train_set_basic.csv')
+    train_df = pd.read_csv('../new_data/train_set_basic.csv')
     train_df = train_df.fillna(-1)
 
     X_train = train_df.iloc[:, 0:-1]
