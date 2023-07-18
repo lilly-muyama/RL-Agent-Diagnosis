@@ -98,7 +98,7 @@ def compute_score(state):
         total_row_score += domain_score
     return total_row_score
 
-def get_pathway_score(pathway):
+def get_pathway_features_score(pathway):
     if isinstance(pathway, str):
         pathway = ast.literal_eval(pathway)
     total_feature_cost = 0
@@ -107,23 +107,52 @@ def get_pathway_score(pathway):
         total_feature_cost += feat_score
     return total_feature_cost
 
-def total_pathway_score(test_df):
+def get_pathway_score(pathway):
+    feature_score = get_pathway_features_score(pathway)
+    pathway_score = 1-(feature_score/constants.MAX_FEATURE_SCORE)
+    return pathway_score
+
+def get_total_pathway_score(test_df):
+    # print('starting total pathway score')
+    # print(test_df.shape)
     total_score = 0
     for i, row in test_df.iterrows():
-        # try:
-        row_feature_score = get_pathway_score(row.trajectory)
+        row_feature_score = get_pathway_features_score(row.trajectory)
         total_row_score = 1-(row_feature_score/constants.MAX_FEATURE_SCORE)
         total_score += total_row_score
         
     return (total_score/len(test_df))*100
 
-def pahm_score(acc, pathway_score):
+def get_pahm_score(acc, pathway_score):
     pathway_acc_harmonic_mean = 2*(acc*pathway_score)/(acc+pathway_score) #mean could be replaced by index hence pahi for the metric name
     return pathway_acc_harmonic_mean
 
-def weighted_pahm_score(numbers, weights): #both are list of the same length
+def get_weighted_mean(test_df):
+    weighted_mean = 0
+    # print('starting weighted mean .....')
+    # print(test_df.shape)
+    # print(type(test_df.iloc[0]['trajectory']))
+
+    if isinstance(test_df.iloc[0]['trajectory'], list):
+        test_df['trajectory'] = test_df['trajectory'].apply(lambda i: str(i))
+    
+    for distinct_path in test_df.trajectory.unique():
+        # print(distinct_path)
+        path_df = test_df[test_df.trajectory == distinct_path]
+        total_num = len(path_df)
+        correct_num = len(path_df[path_df.y_actual == path_df.y_pred])
+        distinct_path_acc = correct_num/total_num
+        
+        distinct_path_score = get_pathway_score(distinct_path)
+        
+        weighted_mean += (distinct_path_acc*distinct_path_score)
+    return weighted_mean     
+
+def get_weighted_pahm_score(numbers, weights): #both are list of the same length
     whm = (weights[0] + weights[1]) / ((weights[0] / numbers[0]) + (weights[1] / numbers[1]))
     return whm
+
+
 
 ################################################################### DQN FUNCTIONS #####################################################################
 
@@ -230,32 +259,24 @@ def evaluate_dqn(dqn_model, X_test, y_test):
                 if done == True:
                     test_df = test_df.append(info, ignore_index=True)
     except StopIteration:
-        print('Testing done.....')
+        # print('Testing done.....')
+        pass
     return test_df
 
-def get_val_metrics(model, validation_env):
-    val_df = pd.DataFrame()
-    try:
-        while True:
-            obs, done = validation_env.reset(), False
-            while not done:
-                action, states = model.predict(obs, deterministic=True)
-                obs, rew, done, info = validation_env.step(action)
-                if done==True:
-                    val_df = val_df.append(info, ignore_index=True)
-
-    except StopIteration:
-        pass
+def get_val_metrics(model, X_val, y_val):
+    val_df = evaluate_dqn(model, X_val, y_val)
     acc, f1, roc_auc, = test(val_df['y_actual'], val_df['y_pred'])
-    pathway_score = total_pathway_score(val_df)
-    pathway_acc_harmonic_mean_score = pahm_score(acc, pathway_score)
-    wpahm_score = weighted_pahm_score([acc, pathway_score], [0.7, 0.3])
-    min_path_length = val_df.episode_length.min()
-    average_path_length = val_df.episode_length.mean()
-    max_path_length = val_df.episode_length.max()
-    min_sample_pathway = val_df[val_df.episode_length==min_path_length].trajectory.iloc[0]
-    max_sample_pathway = val_df[val_df.episode_length==max_path_length].trajectory.iloc[0]
-    return pathway_score, pathway_acc_harmonic_mean_score, wpahm_score, acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
+    pathway_score = get_total_pathway_score(val_df)
+    # pathway_acc_harmonic_mean_score = get_pahm_score(acc, pathway_score)
+    wpahm_score = get_weighted_pahm_score([acc, pathway_score], [0.9, 0.1])
+    # wmean_score = get_weighted_mean(val_df)
+    # min_path_length = val_df.episode_length.min()
+    # average_path_length = val_df.episode_length.mean()
+    # max_path_length = val_df.episode_length.max()
+    # min_sample_pathway = val_df[val_df.episode_length==min_path_length].trajectory.iloc[0]
+    # max_sample_pathway = val_df[val_df.episode_length==max_path_length].trajectory.iloc[0]
+    # return pathway_score, pathway_acc_harmonic_mean_score, wpahm_score, wmean_score, acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
+    return wpahm_score
 
 ############################################################### OTHER MODELS ###################################################################
 
