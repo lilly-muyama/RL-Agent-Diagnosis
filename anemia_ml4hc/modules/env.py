@@ -43,7 +43,10 @@ class AnemiaEnv(gym.Env):
     
     def step(self, action):
         #print(f'type: {type(action)}')
+        # print(f'current state: {}')
+        # print(f'action: {action}')
         if isinstance(action, np.ndarray):
+            # print('changing action type')
             action = int(action)
 
         self.episode_length += 1

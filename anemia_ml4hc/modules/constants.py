@@ -1,4 +1,4 @@
-SEED = 42
+SEED = 63
 
 ACTION_SPACE = ['No anemia', 'Vitamin B12/Folate deficiency anemia', 'Unspecified anemia', 'Anemia of chronic disease', 
 'Iron deficiency anemia', 'Hemolytic anemia', 'Aplastic anemia', 'Inconclusive diagnosis', 'hemoglobin', 'ferritin', 'ret_count',

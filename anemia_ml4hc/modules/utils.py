@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.metrics import confusion_matrix, classification_report
+from stable_baselines.common.callbacks import CheckpointCallback
 from modules.env import AnemiaEnv 
 from modules import constants
 
@@ -46,5 +47,20 @@ def stable_dqn(X_train, y_train, timesteps, log_interval=100000, save=False, fil
     # model.learn(total_timesteps=timesteps, log_interval=log_interval)
     # if save:
     #     model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+    
+def stable_ppo(X_train, y_train, timesteps, log_path, log_prefix='ppo', save=False, filename=None):
+    '''
+    Creates and trains a PPO Model
+    '''
+    from stable_baselines import PPO2
+    training_env = create_env(X_train, y_train)
+    model = PPO2('MlpPolicy', training_env, verbose=1, seed=constants.SEED, n_cpu_tf_sess=1)
+    # checkpoint_callback = CheckpointCallback(save_freq=20000000, save_path=log_path, name_prefix=log_prefix)
+    model.learn(total_timesteps=timesteps, log_interval=100000)
+
+    if save:
+        model.save(f'{filename}.pkl')
     training_env.close()
     return model

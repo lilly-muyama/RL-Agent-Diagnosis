@@ -1,4 +1,4 @@
-from stable_baselines import DQN
+from stable_baselines import DQN, PPO2
 from modules.env import AnemiaEnv
 from modules import constants
 import pandas as pd
@@ -90,6 +90,19 @@ def stable_double_dqn(X_train, y_train, timesteps, save=False, filename=None, pe
         model.save(f'{filename}.pkl')
     training_env.close()
     return model
+
+def stable_ppo(X_train, y_train, timesteps, save=False, filename=None):
+    '''
+    Creates and trains a PPO Model
+    '''
+    training_env = create_env(X_train, y_train)
+    model = PPO2('MlpPolicy', training_env, verbose=1, seed=constants.SEED)
+    model.learn(total_timesteps=timesteps, log_interval=10000)
+    if save:
+        model.save(f'{filename}.pkl')
+    training_env.close()
+    return model
+
 
 def evaluate_dqn(dqn_model, X_test, y_test):
     '''

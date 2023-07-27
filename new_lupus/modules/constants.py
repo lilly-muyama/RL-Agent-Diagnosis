@@ -26,6 +26,8 @@ MAX_STEPS = FEATURE_NUM + 1
 
 CHECKPOINT_FREQ = 1000000
 
+BETA = 3
+
 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'],
 'hematologic': ['leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis'],
