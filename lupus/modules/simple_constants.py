@@ -1,0 +1,53 @@
+import numpy as np # to delete
+# GYM_BOX_LOW = -1 #to delete
+# GYM_BOX_HIGH = np.inf # to delete
+# MAX_STEPS=30 #to delete
+
+
+SEED = 42
+
+# STEP_REWARD = -1
+CORRECT_DIAGNOSIS_REWARD = 1
+INCORRECT_DIAGNOSIS_REWARD = -2
+REPEATED_ACTION_REWARD = -1
+MAX_LENGTH_REWARD = -1
+
+
+#2 FEATURES ANEM DATASET
+# ACTION_SPACE = ['No anemia', 'Anemia', 'Inconclusive diagnosis', 'hemoglobin', 'gender']
+
+#2 FEATURES DATASET
+# ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'anti_dsdna_antibody']
+
+
+#3 FEATURES DATASET
+# ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'anti_dsdna_antibody', 'joint_involvement']
+
+#5 FEATURES DATASET
+# ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'anti_dsdna_antibody', 'joint_involvement', 'proteinuria', 'pericardial_effusion']
+
+#8 FEATURES DATASET
+# ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'anti_dsdna_antibody', 'joint_involvement', 'proteinuria', 'pericardial_effusion',
+# 'non_scarring_alopecia', 'leukopenia', 'delirium']
+
+#11 FEATURES DATASET
+# ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'anti_dsdna_antibody', 'joint_involvement', 'proteinuria', 'pericardial_effusion',
+# 'non_scarring_alopecia', 'leukopenia', 'delirium', 'low_c3_and_c4', 'fever', 'anti_cardioliphin_antibodies']
+
+#22 FEATURES DATASET
+# ACTION_SPACE =  ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'non_scarring_alopecia', 'anti_dsdna_antibody', 'joint_involvement', 
+# 'proteinuria', 'pericardial_effusion', 'leukopenia', 'delirium', 'low_c3', 'low_c4', 'fever', 'thrombocytopenia', 'anti_cardioliphin_antibodies', 
+# 'pleural_effusion', 'psychosis', 'seizure', 'lupus_anti_coagulant', 'anti_β2gp1_antibodies', 'anti_smith_antibody',  'oral_ulcers', 
+# 'auto_immune_hemolysis', 'acute_pericarditis'] #cutaneous lupus left out
+
+#ORIGINAL DATASET
+ACTION_SPACE = ['No lupus', 'Lupus', 'Inconclusive diagnosis', 'ana', 'fever', 'leukopenia', 'thrombocytopenia', 'auto_immune_hemolysis', 'delirium',
+'psychosis', 'seizure', 'non_scarring_alopecia', 'oral_ulcers', 'cutaneous_lupus', 'pleural_effusion', 'pericardial_effusion', 'acute_pericarditis',
+'joint_involvement', 'proteinuria', 'anti_cardioliphin_antibodies', 'anti_β2gp1_antibodies', 'lupus_anti_coagulant', 'low_c3', 'low_c4', 
+'anti_dsdna_antibody', 'anti_smith_antibody']
+
+
+CLASS_DICT = {'No lupus':0, 'Lupus':1, 'Inconclusive diagnosis':2}
+ACTION_NUM = len(ACTION_SPACE)
+CLASS_NUM = len(CLASS_DICT)
+FEATURE_NUM = ACTION_NUM - CLASS_NUM

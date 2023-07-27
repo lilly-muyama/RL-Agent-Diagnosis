@@ -1,0 +1,2 @@
+steps,acc,f1,roc_auc,min_path_length,avg_length,max_length,min_path,max_path
+92000000,92.46428571428571,92.41530931557409,92.29501915708813,2,7.6971428571428575,18,"['ana', 'No lupus']","['ana', 'low_c4', 'pericardial_effusion', 'joint_involvement', 'auto_immune_hemolysis', 'anti_dsdna_antibody', 'proteinuria', 'pleural_effusion', 'anti_smith_antibody', 'low_c3', 'anti_β2gp1_antibodies', 'thrombocytopenia', 'leukopenia', 'non_scarring_alopecia', 'cutaneous_lupus', 'fever', 'delirium', 'No lupus']"
