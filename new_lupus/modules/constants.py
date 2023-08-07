@@ -1,6 +1,6 @@
 # class Constants:
 #     def init(self, args):
-SEED = 126
+SEED = 42
 # self.STEP_REWARD = -1
 CORRECT_DIAGNOSIS_REWARD = 1
 INCORRECT_DIAGNOSIS_REWARD = -1
@@ -26,7 +26,7 @@ MAX_STEPS = FEATURE_NUM + 1
 
 CHECKPOINT_FREQ = 1000000
 
-BETA = 3
+BETA = 9
 
 
 DOMAINS_FEAT_DICT = {'constitutional': ['fever'],

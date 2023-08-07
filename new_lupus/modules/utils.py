@@ -275,13 +275,13 @@ def get_val_metrics(model, X_val, y_val):
     pathway_score = get_total_pathway_score(val_df)
     pahm_score = get_pahm_score(acc, pathway_score)
     wpahm_score = get_weighted_pahm_score([acc, pathway_score], [0.9, 0.1])
-    wmean_score = get_weighted_mean(val_df)
+    # wmean_score = get_weighted_mean(val_df)
     min_path_length = val_df.episode_length.min()
     average_path_length = val_df.episode_length.mean()
     max_path_length = val_df.episode_length.max()
     min_sample_pathway = val_df[val_df.episode_length==min_path_length].trajectory.iloc[0]
     max_sample_pathway = val_df[val_df.episode_length==max_path_length].trajectory.iloc[0]
-    return pathway_score, pahm_score, wpahm_score, wmean_score, acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
+    return pathway_score, pahm_score, wpahm_score, acc, f1, roc_auc, min_path_length, average_path_length, max_path_length, min_sample_pathway, max_sample_pathway
     # return wpahm_score
 
 ############################################################### OTHER MODELS ###################################################################

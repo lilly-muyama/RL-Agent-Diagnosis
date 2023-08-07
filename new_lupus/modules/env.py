@@ -81,8 +81,8 @@ class LupusEnv(Env):
             # else:
             # reward += -1/constants.RISK_FACTORS[self.actions[action]]
             # self.total_reward += -1/constants.RISK_FACTORS[self.actions[action]]
-            # reward += -1/30
-            # self.total_reward += -1/30
+            # reward += 0
+            # self.total_reward += 0
             reward += -1/(constants.BETA*constants.FEATURE_SCORES[self.actions[action]])
             self.total_reward += -1/(constants.BETA*constants.FEATURE_SCORES[self.actions[action]])
             terminated = False

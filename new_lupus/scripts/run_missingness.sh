@@ -17,5 +17,5 @@
 #SBATCH --array=0-4
 
 echo "### Running $SLURM_JOB_NAME with array task $SLURM_ARRAY_TASK_ID ###"
-SEED=(42 63 84 105 126)
-python3 dqn_missingness.py --seed ${SEED[$SLURM_ARRAY_TASK_ID]}
+MISSINGNESS = (0.3 0.4 0.5)
+python3 dqn_missingness.py --seed 42 --missingness ${MISSINGNESS[$SLURM_ARRAY_TASK_ID]}
