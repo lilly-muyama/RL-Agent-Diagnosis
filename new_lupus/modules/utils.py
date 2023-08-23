@@ -14,7 +14,6 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 import xgboost
-from scipy.stats import hmean
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.metrics import confusion_matrix, classification_report
@@ -203,7 +202,7 @@ def stable_dueling_dqn(X_train, y_train, timesteps, save=False, log_path=None, l
         log_prefix = 'dueling_dqn_per'
     training_env = create_env(X_train, y_train)
     model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
-                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, double_q=False, prioritized_replay=per)
+                train_freq=1, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, double_q=False, prioritized_replay=per)
     
     checkpoint_callback = CheckpointCallback(save_freq=constants.CHECKPOINT_FREQ, save_path=log_path, name_prefix=log_prefix)
     model.learn(total_timesteps=timesteps, log_interval=100000, callback=checkpoint_callback)
@@ -220,7 +219,7 @@ def stable_dueling_ddqn(X_train, y_train, timesteps, save=False, log_path=None, 
         log_prefix = 'dueling_ddqn_per'
     training_env = create_env(X_train, y_train)
     model = DQN('MlpPolicy', training_env, verbose=1, seed=constants.SEED, learning_rate=0.0001, buffer_size=1000000, learning_starts=50000, 
-                train_freq=4, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=per)
+                train_freq=1, target_network_update_freq=10000, exploration_final_eps=0.05, n_cpu_tf_sess=1, prioritized_replay=per)
     
     checkpoint_callback = CheckpointCallback(save_freq=constants.CHECKPOINT_FREQ, save_path=log_path, name_prefix=log_prefix)
     model.learn(total_timesteps=timesteps, log_interval=100000, callback=checkpoint_callback)
@@ -355,7 +354,7 @@ def multiclass(actual_class, pred_class, average = 'macro'):
 
 def test(ytest, ypred):
     '''
-    Return perfromance metrics for a model
+    Return performance metrics for a model
     '''
     acc = accuracy_score(ytest, ypred)
     f1 = f1_score(ytest, ypred, average ='macro', labels=np.unique(ytest))
