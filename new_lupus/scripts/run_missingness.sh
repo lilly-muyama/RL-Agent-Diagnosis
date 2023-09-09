@@ -7,7 +7,7 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=REQUEUE
 
-#SBATCH --job-name=biopsy_with_inconclusive_with_missingness 
+#SBATCH --job-name=biopsy_9_with_missingness_levels
 #SBATCH --nodes=1                
 #SBATCH --ntasks=1             
 #SBATCH --cpus-per-task=8 
@@ -17,5 +17,12 @@
 #SBATCH --array=0-4
 
 echo "### Running $SLURM_JOB_NAME with array task $SLURM_ARRAY_TASK_ID ###"
-MISSINGNESS = (0.3 0.4 0.5)
-python3 dqn_missingness.py --seed 42 --missingness ${MISSINGNESS[$SLURM_ARRAY_TASK_ID]}
+MISSINGNESS=(0.1 0.2 0.3)
+BETAS=(3 9)
+SEEDS=(42 63 84 105 126)
+
+for missingness_level in "${MISSINGNESS[@]}" 
+  do
+    python3 dqn_missingness.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --missingness $missingness_level
+  done
+
