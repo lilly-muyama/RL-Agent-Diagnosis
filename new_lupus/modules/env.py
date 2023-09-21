@@ -2,7 +2,8 @@ import os
 import random
 import copy
 import numpy as np
-from modules import constants #changed this
+# from modules.constants import constants #changed this
+from modules import former_constants as constants
 import gym
 from gym import Env
 from gym.spaces import Discrete, Box
@@ -37,7 +38,7 @@ class LupusEnv(Env):
         self.total_reward = 0
         self.seed()
 
-    def seed(self, seed=constants.SEED):
+    def seed(self, seed=constants.SEED): 
         self.np_random, seed = gym.utils.seeding.np_random(seed)
         return [seed]
         

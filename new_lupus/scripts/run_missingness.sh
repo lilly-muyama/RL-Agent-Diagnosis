@@ -17,12 +17,6 @@
 #SBATCH --array=0-4
 
 echo "### Running $SLURM_JOB_NAME with array task $SLURM_ARRAY_TASK_ID ###"
-MISSINGNESS=(0.1 0.2 0.3)
-BETAS=(3 9)
-SEEDS=(42 63 84 105 126)
+SEEDS=(63 84 105 126)
 
-for missingness_level in "${MISSINGNESS[@]}" 
-  do
-    python3 dqn_missingness.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --missingness $missingness_level
-  done
-
+python3 dqn_missingness.py > output.txt --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --missingness 0.1

@@ -17,11 +17,5 @@
 #SBATCH --array=0-4
 
 echo "### Running $SLURM_JOB_NAME with array task $SLURM_ARRAY_TASK_ID ###"
-NOISINESS=(0.1 0.2 0.3)
-BETAS=(3 9)
-SEEDS=(63 84 105 126)
+python3 dqn_noisiness.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --noisiness $noise_level
 
-for noise_level in "${NOISINESS[@]}"
-  do
-    python3 dqn_noisiness.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --noisiness $noise_level
-  done
