@@ -1,5 +1,4 @@
 #!/bin/bash
-#SBATCH --mem=0
 #SBATCH --time=7-00:00:00
 #SBATCH --mail-user=lillian.muyama@inria.fr  
 #SBATCH --mail-type=BEGIN

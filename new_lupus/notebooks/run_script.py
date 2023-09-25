@@ -14,7 +14,7 @@ import argparse
 def run_dqn_model(model_type, seed, steps):
     # dir_name = f'seed_{seed}_{steps}'
     dir_name = f'seed_{seed}_{steps}'
-    parent_dir = f'../models/logs/{model_type}/missingness/0.2/biopsy_9/knn_imputer/default_mean_k_1'
+    parent_dir = f'../models/logs/{model_type}/missingness/0.1/biopsy_9/knn_imputer/default_mean_k_1'
     path = os.path.join(parent_dir, dir_name)
     os.mkdir(path)
   
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     print(f'Seed being used: {constants.SEED}')
 
-    train_df = pd.read_csv('../new_data/knn_imputed/default_mean_k_1/missingness_0.2.csv')
+    train_df = pd.read_csv('../new_data/knn_imputed/default_mean_k_1/missingness_0.1.csv')
 
     X_train = train_df.iloc[:, 0:-1]
     y_train = train_df.iloc[:, -1]
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
 
     steps = int(100e6)
-    model_name = 'dueling_dqn_per'
+    model_name = 'dueling_ddqn_per'
 
     run_dqn_model(model_name, constants.SEED, steps)
     
