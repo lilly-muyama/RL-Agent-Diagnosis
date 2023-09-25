@@ -37,8 +37,8 @@ class RobustDQN(DQN):
             norm_estimate = (sum(qmax ** 2)) ** (1/2)  # dual norm (itself)
         elif self.p_proxy == 'l1-norm':
             norm_estimate = max(abs(qmax))  # dual norm (l_infinity)
-        elif self.p_proxy == 'var-norm': #change this 
-            norm_estimate = np.var(qmax.numpy())**(1/2) #XOR
+        elif self.p_proxy == 'var-norm':
+            norm_estimate = np.var(qmax.numpy())**(1/2)
         return norm_estimate, q_net_argmax
 
         

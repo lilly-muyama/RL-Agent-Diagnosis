@@ -76,14 +76,15 @@ if __name__ == '__main__':
     print(f'Number of steps: {args.steps}')
     print(f'Beta being used: {constants.BETA}')
 
+    #example train dataset
     train_df = pd.read_csv(f'../new_data/train_set_noisiness_{args.noisiness}.csv')
-    # train_df = train_df.fillna(-1)
 
     X_train = train_df.iloc[:, 0:-1]
     y_train = train_df.iloc[:, -1]
     X_train, y_train = np.array(X_train), np.array(y_train)   
 
-    parent_dir = f'../models/logs/robust_dqn3/trial'
+    #example folder
+    parent_dir = f'../models/logs/robust_dqn3/trial' 
     run_robust_dqn_model(X_train, y_train, args.steps, args.seed, args.beta, args.al_r, args.al_p, args.p_proxy, parent_dir)
     
 
