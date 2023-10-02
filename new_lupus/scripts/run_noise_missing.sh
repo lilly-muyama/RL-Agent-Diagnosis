@@ -17,5 +17,5 @@
 
 echo "### Running $SLURM_JOB_NAME with array task $SLURM_ARRAY_TASK_ID ###"
 SEEDS=(42 63 84 105 126)
-python3 dqn_noise_missing.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --missingness 0.2
+python3 dqn_noise_missing.py --seed ${SEEDS[$SLURM_ARRAY_TASK_ID]} --beta 9 --missingness 0.3
 

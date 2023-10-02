@@ -63,8 +63,9 @@ if __name__ == '__main__':
     print(f'Seed being used: {constants.SEED}')
     print(f'Number of steps: {args.steps}')
     print(f'Beta being used: {constants.BETA}')
+    print(f'Missingness level: {args.missingness}')
 
-    train_df = pd.read_csv(f'../new_data/knn_imputed/default_mean_k_1/noisiness_0.2_missingness_{args.missingness}.csv')
+    train_df = pd.read_csv(f'../new_data/knn_imputed/default_mean_k_1/missingness_{args.missingness}.csv')
     train_df = train_df.fillna(-1)
 
     X_train = train_df.iloc[:, 0:-1]
